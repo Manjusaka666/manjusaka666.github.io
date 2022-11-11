@@ -1,13 +1,13 @@
 ---
 layout:     post
-title:      This is title
-subtitle:   This is subtitle
-date:       2019-04-21
-author:     Wang Pei
+title:      La vie en Chamonix
+subtitle:   Chamonix-Mont-Blanc
+date:       2022-11-11
+author:     Jingle Fu
 header-img: img/post-bg-swift2.jpg
 catalog: true
 tags:
-    - Tylor
+    - Mont-Blanc
 ---
 
 
