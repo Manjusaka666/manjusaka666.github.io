@@ -11,6 +11,6 @@ tags:
 ---
 
 
-# Title
+# La vie en Chamonix
 
 This is a test page.
