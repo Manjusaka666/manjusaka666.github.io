@@ -96,8 +96,8 @@ service-worker: true
 # Friends
 friends: [
     {
-        title: "Apple",
-        href: "https://apple.com"
+        title: "BFSU",
+        href: "https://bfsu.edu.cn"
     },{
         title: "IHEID",
         href: "https://graduateinstitute.ch/"
