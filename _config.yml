@@ -7,19 +7,19 @@ description: "一条路，人在途中，从起点，到尽头，也许快乐，
 keyword: "我的博客"
 url: "http://manjusaka666.github.io"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
-github_repo: "https://github.com/name/manjusaka666.github.io.git" # you code repository
+# github_repo: "https://github.com/name/manjusaka666.github.io.git" # you code repository
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
 sidebar-about-description: "踏遍山河无觅处，回首云烟纷沓来。"
-sidebar-avatar: /img/avatar_binggan.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-avatar: /img/avatar_m.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
 # SNS settings
 RSS: false
 weibo_username:     千秋晴空
-zhihu_username:     胜天半子
+# zhihu_username:     胜天半子
 github_username:    Manjusaka666
 wechat_username:  Grothendieck
 #jianshu_username:   暂无
@@ -93,8 +93,8 @@ service-worker: true
 
 
 
-# Friends
-friends: [
+# Education
+Education Backgrounds: [
     {
         title: "BFSU",
         href: "https://bfsu.edu.cn"
