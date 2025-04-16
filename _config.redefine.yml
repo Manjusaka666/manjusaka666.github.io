@@ -130,10 +130,10 @@ home_banner:
     light: /images/wallhaven-wqery6-light.webp # light mode
     dark: /images/wallhaven-wqery6-dark.webp # dark mode
   # Home banner title
-  title: Theme Redefine
+  title: 一条路，人在途中，从起点，到尽头，也许快乐，或有时孤独，如果心在远方，只需勇敢前行，那片天空自会为你引路。
   # Home banner subtitle
   subtitle:
-    text: [] # subtitle text, array
+    text: [踏遍山河无觅处，回首云烟纷沓来。] # subtitle text, array
     hitokoto:  # 一言配置
       enable: false # Whether to enable hitokoto
       show_author: false # Whether to show author
