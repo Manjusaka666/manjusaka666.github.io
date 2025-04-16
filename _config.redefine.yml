@@ -92,7 +92,6 @@ global:
   preloader:
     enable: true
     custom_message: Welcome to our lives! We are happy to share with you our experience travelling, cooking etc.
-    # Custom message. If empty, the site title will be displayed
   # Whether to enable open graph
   open_graph:
     enable: true
@@ -215,8 +214,8 @@ navbar:
       icon: fa-regular fa-user
       submenus:
         Me: /about
-        Github: https://github.com/EvanNotFound/hexo-theme-redefine
-        Blog: https://ohevan.com
+        # Github: https://github.com/
+        # Blog: https://ohevan.com
         Friends: /friends
     # Links: 
     #   icon: fa-regular fa-link
