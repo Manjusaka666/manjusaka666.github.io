@@ -101,8 +101,9 @@ theme: redefine
 # Deployment
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
-  type: ''
-
+  type: git
+  repo: https://github.com/manjusaka666/manjusaka666.github.io.git
+  branch: main
 
 all_minifier: true
   
