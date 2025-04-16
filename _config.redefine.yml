@@ -55,8 +55,8 @@ global:
     # Chinese fonts
     chinese: 
       enable: true # Whether to enable custom chinese fonts
-      family: "Liu Jian Mao Cao" # Font family
-      url: https://fonts.googleapis.com/css2?family=Liu+Jian+Mao+Cao&display=swap # Font URL to CSS file
+      family: "Ma Shan Zheng" # Font family
+      url: https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap # Font URL to CSS file
     # English fonts
     english: 
       enable: true # Whether to enable custom english fonts
