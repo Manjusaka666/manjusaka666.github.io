@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travel Gallery</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+h1 { text-align: center; margin-top: 1rem; }
+.gallery { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; padding: 1rem; }
+.gallery a { flex: 0 0 calc(33.333% - 10px); box-sizing: border-box; }
+.gallery img { width: 100%; height: auto; display: block; }
+@media (max-width: 600px) {
+  .gallery a { flex-basis: calc(50% - 10px); }
+}
+</style>
+</head>
+<body>
+<h1>Travel Gallery</h1>
+<div class="gallery">
+  <a href="/travel/geneva-to-nice/"><img src="img/IMG_20241219_083831.jpg" alt="Geneva to Nice"></a>
+  <a href="/travel/geneva-to-nice/"><img src="img/IMG_20241219_153028.jpg" alt=""></a>
+  <a href="/travel/geneva-to-nice/"><img src="img/IMG_20241219_162652.jpg" alt=""></a>
+  <a href="/travel/geneva-to-nice/"><img src="img/IMG_20241219_163556.jpg" alt=""></a>
+  <a href="/travel/geneva-to-nice/"><img src="img/IMG_20241219_164506.jpg" alt=""></a>
+  <a href="/travel/geneva-to-nice/"><img src="img/IMG_20241219_171516.jpg" alt=""></a>
+</div>
+</body>
+</html>

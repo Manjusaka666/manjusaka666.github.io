@@ -207,9 +207,12 @@ navbar:
     Archives: 
       path: /archives 
       icon: fa-regular fa-archive # can be empty
-    Status: 
-      path: https://status.ohevan.com/
-      icon: fa-regular fa-chart-bar
+    # Status: 
+    #   path: https://status.ohevan.com/
+    #   icon: fa-regular fa-chart-bar
+    Map:
+      path: /map
+      icon: fa-regular fa-map
     About: 
       icon: fa-regular fa-user
       submenus:
