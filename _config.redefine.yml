@@ -65,8 +65,8 @@ global:
     # Custom title fonts (navbar, sidebar)
     title:
       enable: true # Whether to enable custom title fonts
-      family: "Arial" # Font family
-      url: https://fonts.googleapis.com/css?family=Arial # Font URL to CSS file
+      family: "Roboto" # Font family
+      url: https://fonts.googleapis.com/css?family=Roboto # Font URL to CSS file
   # Content max width
   content_max_width: 1000px
   # Sidebar width
