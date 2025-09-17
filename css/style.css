@@ -350,8 +350,6 @@ body .navbar-shrink {
 ul,
 ol,
 li {
-  padding: 0;
-  margin: 0;
   list-style: none;
 }
 a {
@@ -459,7 +457,7 @@ button {
   clear: both;
 }
 .markdown-body {
-  font-family: 'Roboto', 'Liu Jian Mao Cao', sans-serif;
+  font-family: 'Roboto', 'Ma Shan Zheng', sans-serif;
   font-size: 24px;
 }
 .markdown-body blockquote {
@@ -585,7 +583,7 @@ button {
 .markdown-body .h4,
 .markdown-body .h5,
 .markdown-body .h6 {
-  font-family: 'Roboto', 'Liu Jian Mao Cao', sans-serif;
+  font-family: 'Roboto', 'Ma Shan Zheng', sans-serif;
   color: var(--second-text-color);
   line-height: 1.5;
 }
@@ -738,6 +736,7 @@ button {
   width: 100%;
   overflow: auto;
   margin-bottom: 1.2rem;
+  margin-top: 1rem;
   box-shadow: var(--redefine-box-shadow-flat);
   border-radius: 14px;
 }
@@ -1770,7 +1769,7 @@ pre .deletion {
   line-height: 1;
   color: var(--first-text-color);
   transform: translateY(1px);
-  font-family: 'Arial';
+  font-family: 'Roboto';
 }
 .navbar-container .navbar-content .logo-title h1 {
   margin: 0;
@@ -2592,7 +2591,7 @@ html.is-animating .scroll-progress-bar {
   width: 100%;
   font-size: 0.92rem;
   box-sizing: border-box;
-  font-family: 'Roboto', 'Liu Jian Mao Cao', 'Noto Sans', 'Noto Sans SC', sans-serif;
+  font-family: 'Roboto', 'Ma Shan Zheng', 'Noto Sans', 'Noto Sans SC', sans-serif;
 }
 .post-toc-wrap .post-toc .toc-title {
   font-size: 0.8rem;
@@ -5544,7 +5543,7 @@ html.is-animating .transition-fade-down {
   font-size: 1.4rem;
   line-height: 1.5;
   color: var(--second-text-color);
-  font-family: 'Roboto', 'Liu Jian Mao Cao', 'Noto Sans SC', sans-serif;
+  font-family: 'Roboto', 'Ma Shan Zheng', 'Noto Sans SC', sans-serif;
   margin: 0;
 }
 @media (max-width: 768px) {
@@ -6123,7 +6122,7 @@ html.is-animating .transition-fade-down {
   color: var(--second-text-color);
   font-family: 'Chillax-Variable', sans-serif;
   text-align: center;
-  font-family: 'Arial';
+  font-family: 'Roboto';
 }
 .home-sidebar-container .sidebar-links .site-info .announcement {
   font-size: 0.9rem;
