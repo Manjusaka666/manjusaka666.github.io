@@ -17,6 +17,11 @@
 #map {
   height: 100%;
   width: 100%;
+  min-height: 540px;
+}
+
+.travel-map-canvas {
+  min-height: 100vh;
 }
 
 .travel-input {
