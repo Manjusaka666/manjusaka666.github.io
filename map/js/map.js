@@ -28,7 +28,10 @@
         lat: layer.getLatLng().lat,
         lng: layer.getLatLng().lng,
         icon: layer.options && layer.options.icon && layer.options.icon.options && layer.options.icon.options.html ? layer.options.icon.options.html : '📍',
-        title: layer.options && layer.options.title ? layer.options.title : ''
+        title: layer.options && layer.options.title ? layer.options.title : '',
+        notes: layer.options && layer.options.notes ? layer.options.notes : '',
+        date: layer.options && layer.options.date ? layer.options.date : '',
+        photoLink: layer.options && layer.options.photoLink ? layer.options.photoLink : ''
       });
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -42,10 +45,17 @@
       const arr = JSON.parse(raw);
       arr.forEach(item => {
         const emoji = extractEmojiFromHtml(item.icon) || '📍';
-        const marker = L.marker([item.lat, item.lng], {icon: createEmojiIcon(emoji), title: item.title || ''});
+        const marker = L.marker([item.lat, item.lng], {icon: createEmojiIcon(emoji), title: item.title || '', draggable: true});
+        marker.options.notes = item.notes || '';
+        marker.options.date = item.date || '';
+        marker.options.photoLink = item.photoLink || '';
         marker.addTo(markers);
-        marker.bindPopup(`<strong>${escapeHtml(item.title || emoji)}</strong><br/><button class="delete-marker">删除</button>`);
+        marker.bindPopup(createPopupContent(marker, item.title, item.notes, item.date, item.photoLink));
         marker.on('popupopen', e => attachDeleteHandler(e.popup, marker));
+        marker.on('dragend', () => {
+          saveMarkers();
+          refreshPlacesList();
+        });
       });
       refreshPlacesList();
     } catch (e) {
@@ -55,11 +65,29 @@
 
   function attachDeleteHandler(popup, marker) {
     const btn = popup.getElement().querySelector('.delete-marker');
+    const saveBtn = popup.getElement().querySelector('.save-edit');
     if (btn) {
       btn.onclick = () => {
         markers.removeLayer(marker);
         saveMarkers();
         refreshPlacesList();
+      };
+    }
+    if (saveBtn) {
+      saveBtn.onclick = () => {
+        const titleInput = popup.getElement().querySelector('.edit-title');
+        const notesInput = popup.getElement().querySelector('.edit-notes');
+        const dateInput = popup.getElement().querySelector('.edit-date');
+        const photoInput = popup.getElement().querySelector('.edit-photo');
+        if (titleInput && notesInput && dateInput && photoInput) {
+          marker.options.title = titleInput.value;
+          marker.options.notes = notesInput.value;
+          marker.options.date = dateInput.value;
+          marker.options.photoLink = photoInput.value;
+          marker.setPopupContent(createPopupContent(marker, marker.options.title, marker.options.notes, marker.options.date, marker.options.photoLink));
+          saveMarkers();
+          refreshPlacesList();
+        }
       };
     }
   }
@@ -71,16 +99,36 @@
     return m ? m[1] : null;
   }
 
-  function escapeHtml(s) {
-    return (s || '').replace(/[&"'<>]/g, c => ({'&':'&amp;','"':'&quot;','\'':'&#39;','<':'&lt;','>':'&gt;'}[c]));
+  function createPopupContent(marker, title, notes, date, photoLink) {
+    const latlng = marker.getLatLng();
+    return `
+      <div class="marker-popup">
+        <div class="marker-info">
+          <strong>${escapeHtml(title || '标记')}</strong><br/>
+          <small>经纬度: ${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}</small>
+        </div>
+        <div class="marker-edit">
+          <label>标题: <input type="text" class="edit-title" value="${escapeHtml(title || '')}" /></label><br/>
+          <label>备注: <textarea class="edit-notes">${escapeHtml(notes || '')}</textarea></label><br/>
+          <label>日期: <input type="date" class="edit-date" value="${date || ''}" /></label><br/>
+          <label>照片链接: <input type="url" class="edit-photo" value="${escapeHtml(photoLink || '')}" /></label><br/>
+          <button class="save-edit">保存</button>
+        </div>
+        <button class="delete-marker">删除</button>
+      </div>
+    `;
   }
 
   // Add marker at given latlng with emoji and optional title
-  function addMarker(latlng, emoji, title) {
-    const marker = L.marker(latlng, {icon: createEmojiIcon(emoji), title: title || ''});
+  function addMarker(latlng, emoji, title, notes, date, photoLink) {
+    const marker = L.marker(latlng, {icon: createEmojiIcon(emoji), title: title || '', draggable: true});
     marker.addTo(markers);
-    marker.bindPopup(`<strong>${escapeHtml(title || emoji)}</strong><br/><button class="delete-marker">删除</button>`);
+    marker.bindPopup(createPopupContent(marker, title, notes, date, photoLink));
     marker.on('popupopen', e => attachDeleteHandler(e.popup, marker));
+    marker.on('dragend', () => {
+      saveMarkers();
+      refreshPlacesList();
+    });
     saveMarkers();
     refreshPlacesList();
   }
@@ -113,12 +161,33 @@
         alert('未找到地点');
         return;
       }
-      const first = results[0];
-      const lat = parseFloat(first.lat);
-      const lon = parseFloat(first.lon);
-      map.setView([lat, lon], 12);
-      addMarker([lat, lon], iconSelect.value, first.display_name);
+      showSearchResults(results);
     }).catch(err => { searchBtn.disabled = false; alert('搜索出错'); console.error(err); });
+  }
+
+  function showSearchResults(results) {
+    const resultsDiv = document.createElement('div');
+    resultsDiv.className = 'search-results';
+    resultsDiv.innerHTML = '<h3>选择地点：</h3>';
+    const ul = document.createElement('ul');
+    results.slice(0, 5).forEach((result, idx) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="select-result">${result.display_name}</button>`;
+      li.querySelector('.select-result').onclick = () => {
+        const lat = parseFloat(result.lat);
+        const lon = parseFloat(result.lon);
+        map.setView([lat, lon], 12);
+        addMarker([lat, lon], iconSelect.value, result.display_name);
+        document.body.removeChild(resultsDiv);
+      };
+      ul.appendChild(li);
+    });
+    resultsDiv.appendChild(ul);
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.onclick = () => document.body.removeChild(resultsDiv);
+    resultsDiv.appendChild(closeBtn);
+    document.body.appendChild(resultsDiv);
   }
 
   addMarkerBtn.addEventListener('click', () => {
