@@ -707,6 +707,12 @@
       </aside>
       <div class="travel-map-canvas relative h-[70vh] w-full overflow-hidden rounded-3xl border border-[color:var(--color-border-color,#e5e7eb)] bg-[color:var(--color-second-background-color,#fefefe)] shadow-lg dark:border-transparent dark:bg-[color:var(--color-third-background-color,#111)]">
         <div id="map" class="absolute inset-0"></div>
+        <div class="travel-map-controls pointer-events-none absolute inset-0 flex flex-col justify-between p-6">
+          <div class="placement-panel pointer-events-auto max-w-xs rounded-2xl bg-[color:var(--color-second-background-color,#fff)]/95 p-5 shadow-lg ring-1 ring-[color:var(--color-border-color,#e5e7eb)] backdrop-blur">
+            <button id="placement-toggle" type="button" class="placement-button">开启地图标记模式</button>
+            <p class="placement-hint">选中想要的图标后，切换到标记模式，在地图上点击即可落点，随后可在弹窗内完善信息并拖动位置。</p>
+          </div>
+        </div>
         <div class="travel-map-backdrop pointer-events-none absolute inset-x-6 bottom-6 flex justify-end">
           <div class="pointer-events-auto rounded-full bg-[color:var(--color-second-background-color,#fff)]/90 px-4 py-2 text-xs text-[color:var(--color-second-text-color,#666)] shadow-md backdrop-blur">
             <span id="map-center-preview" class="font-medium text-[color:var(--color-first-text-color,#111)]"></span>

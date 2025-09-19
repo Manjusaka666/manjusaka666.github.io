@@ -409,6 +409,57 @@
   font-size: 0.9rem;
 }
 
+
+.travel-map-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  pointer-events: none;
+}
+
+.placement-panel {
+  color: var(--travel-text);
+  background: var(--travel-surface);
+}
+
+.placement-button {
+  width: 100%;
+  border: none;
+  border-radius: 9999px;
+  background: rgba(163, 31, 52, 0.1);
+  color: var(--travel-primary);
+  font-weight: 600;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.placement-button:hover {
+  transform: translateY(-1px);
+  background: rgba(163, 31, 52, 0.18);
+}
+
+.placement-button.active {
+  background: var(--travel-primary);
+  color: #fff;
+}
+
+.placement-hint {
+  margin-top: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--travel-text-muted);
+}
+
+
+.map-placement-active #map {
+  cursor: crosshair;
+}
+
+.map-placement-active .placement-button.active {
+  box-shadow: 0 22px 44px -24px rgba(163, 31, 52, 0.6);
+}
+
 @media (max-width: 1024px) {
   [data-map-page] .travel-map-pane {
     box-shadow: none;
