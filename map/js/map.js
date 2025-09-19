@@ -1,9 +1,34 @@
-// map/js/map.js
-// 依赖 Leaflet
+// /map/js/map.js
 (function () {
-  const STORAGE_KEY = 'my_travel_map_markers_v1';
+  const STORAGE_KEY = 'my_travel_map_markers_v2';
 
-  const map = L.map('map').setView([20, 0], 2);
+  // ---------- 工具 ----------
+  function escapeHtml(str) {
+    return (str || '').replace(/[&<>"'`=\/]/g, s => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+      '`': '&#x60;', '=': '&#x3D;', '/': '&#x2F;'
+    })[s]);
+  }
+  function throttle(fn, wait) {
+    let last = 0, timer = null, lastArgs = null;
+    return function (...args) {
+      const now = Date.now();
+      lastArgs = args;
+      if (now - last >= wait) {
+        last = now; fn.apply(this, args);
+      } else if (!timer) {
+        timer = setTimeout(() => { last = Date.now(); timer = null; fn.apply(this, lastArgs); }, wait);
+      }
+    };
+  }
+  function extractEmojiFromHtml(html) {
+    if (!html) return null;
+    const m = html.match(/>([^<]+)</);
+    return m ? m[1] : null;
+  }
+
+  // ---------- 地图 ----------
+  const map = L.map('map', { scrollWheelZoom: true }).setView([20, 0], 2);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 19,
     attribution: '&copy; OpenStreetMap contributors'
@@ -27,234 +52,167 @@
       data.push({
         lat: layer.getLatLng().lat,
         lng: layer.getLatLng().lng,
-        icon: layer.options && layer.options.icon && layer.options.icon.options && layer.options.icon.options.html ? layer.options.icon.options.html : '📍',
-        title: layer.options && layer.options.title ? layer.options.title : '',
-        notes: layer.options && layer.options.notes ? layer.options.notes : '',
-        date: layer.options && layer.options.date ? layer.options.date : '',
-        photoLink: layer.options && layer.options.photoLink ? layer.options.photoLink : ''
+        icon: layer.options?.icon?.options?.html || '📍',
+        title: layer.options?.title || '',
+        notes: layer.options?.notes || '',
+        date: layer.options?.date || '',
+        photoLink: layer.options?.photoLink || ''
       });
     });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  }
+  const saveMarkersThrottled = throttle(saveMarkers, 300);
+
+  function createPopupContent(marker, title, notes, date, photoLink) {
+    const latlng = marker.getLatLng();
+    const hasPhoto = photoLink && /^https?:\/\//i.test(photoLink);
+    const imgHtml = hasPhoto ? `<div class="photo-wrap"><a href="${escapeHtml(photoLink)}" target="_blank">查看原图</a><br><img src="${escapeHtml(photoLink)}" alt="photo" loading="lazy"/></div>` : '';
+    return `
+      <div class="marker-popup">
+        <div class="marker-info">
+          <strong>${escapeHtml(title || '标记')}</strong><br/>
+          <small>经纬度: <span class="lat">${latlng.lat.toFixed(6)}</span>, <span class="lng">${latlng.lng.toFixed(6)}</span></small>
+          <button class="copy-latlng">复制</button>
+        </div>
+        ${imgHtml}
+        <div class="marker-edit">
+          <label>标题: <input type="text" class="edit-title" value="${escapeHtml(title || '')}" /></label>
+          <label>备注: <textarea class="edit-notes">${escapeHtml(notes || '')}</textarea></label>
+          <label>日期: <input type="date" class="edit-date" value="${date || ''}" /></label>
+          <label>照片链接: <input type="url" class="edit-photo" value="${escapeHtml(photoLink || '')}" /></label>
+          <div class="btn-row">
+            <button class="save-edit">保存</button>
+            <button class="delete-marker danger">删除</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function attachPopupHandlers(popup, marker) {
+    const root = popup.getElement();
+    if (!root) return;
+    root.querySelector('.delete-marker').onclick = () => {
+      markers.removeLayer(marker); saveMarkers(); refreshPlacesList();
+    };
+    root.querySelector('.save-edit').onclick = () => {
+      marker.options.title = root.querySelector('.edit-title').value || '';
+      marker.options.notes = root.querySelector('.edit-notes').value || '';
+      marker.options.date = root.querySelector('.edit-date').value || '';
+      marker.options.photoLink = root.querySelector('.edit-photo').value || '';
+      marker.setPopupContent(createPopupContent(marker, marker.options.title, marker.options.notes, marker.options.date, marker.options.photoLink));
+      marker.once('popupopen', e => attachPopupHandlers(e.popup, marker));
+      saveMarkers(); refreshPlacesList();
+    };
+    root.querySelector('.copy-latlng').onclick = async () => {
+      const { lat, lng } = marker.getLatLng();
+      await navigator.clipboard.writeText(`${lat}, ${lng}`);
+    };
+  }
+
+  function addMarker(latlng, emoji, title, notes, date, photoLink) {
+    const marker = L.marker(latlng, { icon: createEmojiIcon(emoji), title: title || '', draggable: true });
+    marker.options.notes = notes || '';
+    marker.options.date = date || '';
+    marker.options.photoLink = photoLink || '';
+    marker.addTo(markers);
+    marker.bindPopup(createPopupContent(marker, title, notes, date, photoLink));
+    marker.on('popupopen', e => attachPopupHandlers(e.popup, marker));
+    marker.on('drag', () => {
+      if (marker.isPopupOpen()) {
+        const el = marker.getPopup().getElement();
+        el.querySelector('.lat').textContent = marker.getLatLng().lat.toFixed(6);
+        el.querySelector('.lng').textContent = marker.getLatLng().lng.toFixed(6);
+      }
+      saveMarkersThrottled();
+    });
+    marker.on('dragend', () => { saveMarkers(); refreshPlacesList(); });
+    saveMarkers(); refreshPlacesList();
   }
 
   function loadMarkers() {
     markers.clearLayers();
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
-    try {
-      const arr = JSON.parse(raw);
-      arr.forEach(item => {
-        const emoji = extractEmojiFromHtml(item.icon) || '📍';
-        const marker = L.marker([item.lat, item.lng], {icon: createEmojiIcon(emoji), title: item.title || '', draggable: true});
-        marker.options.notes = item.notes || '';
-        marker.options.date = item.date || '';
-        marker.options.photoLink = item.photoLink || '';
-        marker.addTo(markers);
-        marker.bindPopup(createPopupContent(marker, item.title, item.notes, item.date, item.photoLink));
-        marker.on('popupopen', e => attachDeleteHandler(e.popup, marker));
-        marker.on('dragend', () => {
-          saveMarkers();
-          refreshPlacesList();
-        });
-      });
-      refreshPlacesList();
-    } catch (e) {
-      console.error('加载标记失败', e);
-    }
-  }
-
-  function attachDeleteHandler(popup, marker) {
-    const btn = popup.getElement().querySelector('.delete-marker');
-    const saveBtn = popup.getElement().querySelector('.save-edit');
-    if (btn) {
-      btn.onclick = () => {
-        markers.removeLayer(marker);
-        saveMarkers();
-        refreshPlacesList();
-      };
-    }
-    if (saveBtn) {
-      saveBtn.onclick = () => {
-        const titleInput = popup.getElement().querySelector('.edit-title');
-        const notesInput = popup.getElement().querySelector('.edit-notes');
-        const dateInput = popup.getElement().querySelector('.edit-date');
-        const photoInput = popup.getElement().querySelector('.edit-photo');
-        if (titleInput && notesInput && dateInput && photoInput) {
-          marker.options.title = titleInput.value;
-          marker.options.notes = notesInput.value;
-          marker.options.date = dateInput.value;
-          marker.options.photoLink = photoInput.value;
-          marker.setPopupContent(createPopupContent(marker, marker.options.title, marker.options.notes, marker.options.date, marker.options.photoLink));
-          saveMarkers();
-          refreshPlacesList();
-        }
-      };
-    }
-  }
-
-  function extractEmojiFromHtml(html) {
-    if (!html) return null;
-    // html like <div class="emoji-marker">📍</div>
-    const m = html.match(/>([^<]+)</);
-    return m ? m[1] : null;
-  }
-
-  function createPopupContent(marker, title, notes, date, photoLink) {
-    const latlng = marker.getLatLng();
-    return `
-      <div class="marker-popup">
-        <div class="marker-info">
-          <strong>${escapeHtml(title || '标记')}</strong><br/>
-          <small>经纬度: ${latlng.lat.toFixed(6)}, ${latlng.lng.toFixed(6)}</small>
-        </div>
-        <div class="marker-edit">
-          <label>标题: <input type="text" class="edit-title" value="${escapeHtml(title || '')}" /></label><br/>
-          <label>备注: <textarea class="edit-notes">${escapeHtml(notes || '')}</textarea></label><br/>
-          <label>日期: <input type="date" class="edit-date" value="${date || ''}" /></label><br/>
-          <label>照片链接: <input type="url" class="edit-photo" value="${escapeHtml(photoLink || '')}" /></label><br/>
-          <button class="save-edit">保存</button>
-        </div>
-        <button class="delete-marker">删除</button>
-      </div>
-    `;
-  }
-
-  // Add marker at given latlng with emoji and optional title
-  function addMarker(latlng, emoji, title, notes, date, photoLink) {
-    const marker = L.marker(latlng, {icon: createEmojiIcon(emoji), title: title || '', draggable: true});
-    marker.addTo(markers);
-    marker.bindPopup(createPopupContent(marker, title, notes, date, photoLink));
-    marker.on('popupopen', e => attachDeleteHandler(e.popup, marker));
-    marker.on('dragend', () => {
-      saveMarkers();
-      refreshPlacesList();
+    JSON.parse(raw).forEach(item => {
+      const emoji = extractEmojiFromHtml(item.icon) || '📍';
+      addMarker([item.lat, item.lng], emoji, item.title, item.notes, item.date, item.photoLink);
     });
-    saveMarkers();
-    refreshPlacesList();
   }
 
-  // UI hooks
+  // ---------- 搜索 ----------
+  function nominatimSearch(q) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=8&accept-language=zh-CN&q=${encodeURIComponent(q)}`;
+    return fetch(url).then(r => r.json());
+  }
+  function showSearchResults(results) {
+    document.querySelector('.search-results')?.remove();
+    const div = document.createElement('div');
+    div.className = 'search-results';
+    div.innerHTML = '<h3>选择地点：</h3>';
+    const ul = document.createElement('ul');
+    results.forEach(r => {
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="select-result">${escapeHtml(r.display_name)}</button>`;
+      li.querySelector('button').onclick = () => {
+        map.setView([+r.lat, +r.lon], 12);
+        addMarker([+r.lat, +r.lon], iconSelect.value, r.display_name);
+        div.remove();
+      };
+      ul.appendChild(li);
+    });
+    div.appendChild(ul);
+    const close = document.createElement('button'); close.textContent = '关闭'; close.onclick = () => div.remove();
+    div.appendChild(close); document.body.appendChild(div);
+  }
+
+  // ---------- 左侧列表 ----------
+  function refreshPlacesList() {
+    placesList.innerHTML = '';
+    const ul = document.createElement('ul');
+    markers.eachLayer(layer => {
+      const { lat, lng } = layer.getLatLng();
+      const emoji = extractEmojiFromHtml(layer.options.icon.options.html) || '📍';
+      const li = document.createElement('li');
+      li.innerHTML = `<button class="goto">${emoji}</button> <span class="place-title">${escapeHtml(layer.options.title || '')}</span> <button class="del danger">删除</button>`;
+      li.querySelector('.goto').onclick = () => { map.setView([lat, lng], 10); layer.openPopup(); };
+      li.querySelector('.del').onclick = () => { markers.removeLayer(layer); saveMarkers(); refreshPlacesList(); };
+      ul.appendChild(li);
+    });
+    if (ul.children.length) placesList.appendChild(ul); else placesList.innerHTML = '<p>还没有标记</p>';
+  }
+
+  // ---------- 事件 ----------
   const searchInput = document.getElementById('search-input');
-  const searchBtn = document.getElementById('search-btn');
-  const iconSelect = document.getElementById('icon-select');
+  const searchBtn   = document.getElementById('search-btn');
+  const iconSelect  = document.getElementById('icon-select');
   const addMarkerBtn = document.getElementById('add-marker-btn');
   const clearMarkersBtn = document.getElementById('clear-markers-btn');
   const exportBtn = document.getElementById('export-btn');
   const importFile = document.getElementById('import-file');
   const placesList = document.getElementById('places-list');
 
-  function nominatimSearch(q) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`;
-    return fetch(url, {headers:{'Accept':'application/json'}}).then(r=>r.json());
-  }
-
-  searchBtn.addEventListener('click', () => doSearch());
-  searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(); });
-
   function doSearch() {
-    const q = searchInput.value.trim();
-    if (!q) return;
-    searchBtn.disabled = true;
-    nominatimSearch(q).then(results => {
-      searchBtn.disabled = false;
-      if (!results || results.length === 0) {
-        alert('未找到地点');
-        return;
-      }
-      showSearchResults(results);
-    }).catch(err => { searchBtn.disabled = false; alert('搜索出错'); console.error(err); });
+    const q = searchInput.value.trim(); if (!q) return;
+    nominatimSearch(q).then(r => r.length ? showSearchResults(r) : alert('未找到')).catch(() => alert('搜索出错'));
   }
+  searchBtn.onclick = doSearch;
+  searchInput.onkeydown = e => { if (e.key === 'Enter') doSearch(); };
 
-  function showSearchResults(results) {
-    const resultsDiv = document.createElement('div');
-    resultsDiv.className = 'search-results';
-    resultsDiv.innerHTML = '<h3>选择地点：</h3>';
-    const ul = document.createElement('ul');
-    results.slice(0, 5).forEach((result, idx) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<button class="select-result">${result.display_name}</button>`;
-      li.querySelector('.select-result').onclick = () => {
-        const lat = parseFloat(result.lat);
-        const lon = parseFloat(result.lon);
-        map.setView([lat, lon], 12);
-        addMarker([lat, lon], iconSelect.value, result.display_name);
-        document.body.removeChild(resultsDiv);
-      };
-      ul.appendChild(li);
-    });
-    resultsDiv.appendChild(ul);
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '关闭';
-    closeBtn.onclick = () => document.body.removeChild(resultsDiv);
-    resultsDiv.appendChild(closeBtn);
-    document.body.appendChild(resultsDiv);
-  }
-
-  addMarkerBtn.addEventListener('click', () => {
-    const center = map.getCenter();
-    addMarker([center.lat, center.lng], iconSelect.value, '');
-  });
-
-  clearMarkersBtn.addEventListener('click', () => {
-    if (!confirm('确认清除所有标记？')) return;
-    markers.clearLayers();
-    saveMarkers();
-    refreshPlacesList();
-  });
-
-  exportBtn.addEventListener('click', () => {
+  addMarkerBtn.onclick = () => addMarker(map.getCenter(), iconSelect.value, '');
+  clearMarkersBtn.onclick = () => { if (confirm('确认清除?')) { markers.clearLayers(); saveMarkers(); refreshPlacesList(); } };
+  exportBtn.onclick = () => {
     const raw = localStorage.getItem(STORAGE_KEY) || '[]';
-    const blob = new Blob([raw], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'markers.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  });
-
-  importFile.addEventListener('change', (e) => {
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
+    const blob = new Blob([raw], {type:'application/json'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = 'markers.json'; a.click(); URL.revokeObjectURL(url);
+  };
+  importFile.onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
     const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const arr = JSON.parse(reader.result);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-        loadMarkers();
-        alert('导入成功');
-      } catch (err) { alert('导入失败：文件格式错误'); }
-    };
+    reader.onload = () => { try { localStorage.setItem(STORAGE_KEY, reader.result); loadMarkers(); } catch { alert('导入失败'); } };
     reader.readAsText(f);
-  });
+  };
 
-  function refreshPlacesList() {
-    placesList.innerHTML = '';
-    const list = [];
-    markers.eachLayer(layer => {
-      if (!layer.getLatLng) return;
-      const latlng = layer.getLatLng();
-      const title = layer.options && layer.options.title ? layer.options.title : '';
-      const emoji = extractEmojiFromHtml(layer.options.icon.options.html) || '📍';
-      list.push({latlng, title, emoji, layer});
-    });
-    if (list.length === 0) {
-      placesList.innerHTML = '<p>还没有标记。你可以搜索并添加标记，或在地图中心添加。</p>';
-      return;
-    }
-    const ul = document.createElement('ul');
-    list.forEach((it, idx) => {
-      const li = document.createElement('li');
-      li.innerHTML = `<button class="goto">${it.emoji}</button> <span class="place-title">${escapeHtml(it.title || `标记 ${idx+1}`)}</span> <button class="del">删除</button>`;
-      const gotoBtn = li.querySelector('.goto');
-      const delBtn = li.querySelector('.del');
-      gotoBtn.onclick = () => { map.setView(it.latlng, 10); it.layer.openPopup(); };
-      delBtn.onclick = () => { markers.removeLayer(it.layer); saveMarkers(); refreshPlacesList(); };
-      ul.appendChild(li);
-    });
-    placesList.appendChild(ul);
-  }
-
-  // Load on start
+  // init
   loadMarkers();
-
 })();

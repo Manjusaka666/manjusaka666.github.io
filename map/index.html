@@ -12,7 +12,7 @@
     <aside class="map-sidebar">
       <h2>我的地图</h2>
       <div class="control-group">
-        <input id="search-input" placeholder="搜索地点 (按回车或点搜索)" />
+        <input id="search-input" placeholder="搜索地点 (回车/按钮)" />
         <button id="search-btn">搜索</button>
       </div>
       <div class="control-group">
@@ -28,7 +28,7 @@
       </div>
       <div class="control-group">
         <button id="add-marker-btn">在中心添加标记</button>
-        <button id="clear-markers-btn">清除所有标记</button>
+        <button id="clear-markers-btn" class="danger">清除所有标记</button>
       </div>
       <div class="control-group">
         <button id="export-btn">导出标记 (JSON)</button>
@@ -45,32 +45,5 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="/map/js/map.js"></script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Visited Map</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-<style>
-#map { height: 600px; width: 100%; }
-</style>
-</head>
-<body>
-<h1 style="text-align:center">Visited Places</h1>
-<div id="map"></div>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script>
-var map = L.map('map').setView([20,0], 2);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
-var places = [
-  {lat: 46.2044, lng: 6.1432, label: 'Geneva'},
-  {lat: 43.7102, lng: 7.2620, label: 'Nice'}
-];
-places.forEach(function(p){
-  L.marker([p.lat, p.lng]).addTo(map).bindPopup(p.label);
-});
-</script>
 </body>
 </html>
