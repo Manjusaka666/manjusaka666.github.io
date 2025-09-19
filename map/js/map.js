@@ -30,8 +30,11 @@ const TravelMap = (() => {
       clearMarkersButton: null,
       exportButton: null,
       importInput: null,
+      placementToggle: null,
       searchResultData: [],
       saveThrottlerId: null,
+      isPlacementMode: false,
+      mapClickHandler: null,
     };
     return state;
   }
@@ -51,6 +54,18 @@ const TravelMap = (() => {
       '=': '&#x3D;',
       '/': '&#x2F;',
     })[char]);
+  }
+
+  function setPlacementMode(enabled) {
+    const s = ensureState();
+    s.isPlacementMode = Boolean(enabled);
+    if (s.placementToggle) {
+      s.placementToggle.classList.toggle('active', s.isPlacementMode);
+      s.placementToggle.textContent = s.isPlacementMode ? '标记模式已开启 (Esc 退出)' : '开启地图标记模式';
+    }
+    if (s.root) {
+      s.root.classList.toggle('map-placement-active', s.isPlacementMode);
+    }
   }
 
   function setAssetConfig(dataset = {}) {
@@ -516,6 +531,18 @@ const TravelMap = (() => {
       event.target.value = '';
     });
 
+    if (s.placementToggle) {
+      bind(s.placementToggle, 'click', () => {
+        setPlacementMode(!s.isPlacementMode);
+      });
+    }
+
+    bind(document, 'keydown', (event) => {
+      if (event.key === 'Escape' && s.isPlacementMode) {
+        setPlacementMode(false);
+      }
+    });
+
     bind(s.placesList, 'click', (event) => {
       const actionButton = event.target.closest('[data-action]');
       if (!actionButton) return;
@@ -553,6 +580,7 @@ const TravelMap = (() => {
     s.importInput = root.querySelector('#import-file');
     s.placesList = root.querySelector('#places-list');
     s.centerPreview = root.querySelector('#map-center-preview');
+    s.placementToggle = root.querySelector('#placement-toggle');
 
     const mapElement = root.querySelector('#map');
     if (!mapElement) return;
@@ -580,7 +608,25 @@ const TravelMap = (() => {
       }
     });
 
+    s.mapClickHandler = (event) => {
+      if (!s.isPlacementMode) return;
+      const { lat, lng } = event.latlng;
+      const marker = addMarker([lat, lng], s.iconSelect ? s.iconSelect.value : '📍', {});
+      marker.openPopup();
+    };
+    s.map.on('click', s.mapClickHandler);
+    s.unsubscribers.push(() => {
+      try {
+        if (s.map && s.mapClickHandler) {
+          s.map.off('click', s.mapClickHandler);
+        }
+      } catch (error) {
+        console.warn('Failed to detach click handler', error);
+      }
+    });
+
     setupEventHandlers();
+    setPlacementMode(false);
     updateCenterPreview();
     loadMarkers();
   }
@@ -605,6 +651,14 @@ const TravelMap = (() => {
 
     s.markerRegistry.clear();
     markRootReady(s.root, '');
+    if (s.root) {
+      s.root.classList.remove('map-placement-active');
+    }
+    if (s.placementToggle) {
+      s.placementToggle.classList.remove('active');
+      s.placementToggle.textContent = '开启地图标记模式';
+    }
+    s.isPlacementMode = false;
 
     state = null;
   }
