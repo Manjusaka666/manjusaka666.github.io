@@ -1,3 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我的旅行地图</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+  <link rel="stylesheet" href="/map/css/map.css" />
+</head>
+<body>
+  <div class="map-container">
+    <aside class="map-sidebar">
+      <h2>我的地图</h2>
+      <div class="control-group">
+        <input id="search-input" placeholder="搜索地点 (按回车或点搜索)" />
+        <button id="search-btn">搜索</button>
+      </div>
+      <div class="control-group">
+        <label for="icon-select">标记符号：</label>
+        <select id="icon-select">
+          <option value="📍">📍 默认</option>
+          <option value="✈️">✈️ 旅行</option>
+          <option value="🏠">🏠 居住</option>
+          <option value="🏞️">🏞️ 风景</option>
+          <option value="🍜">🍜 美食</option>
+          <option value="⭐">⭐ 特别</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <button id="add-marker-btn">在中心添加标记</button>
+        <button id="clear-markers-btn">清除所有标记</button>
+      </div>
+      <div class="control-group">
+        <button id="export-btn">导出标记 (JSON)</button>
+        <input type="file" id="import-file" accept="application/json" />
+      </div>
+      <hr />
+      <div id="places-list" class="places-list"></div>
+    </aside>
+
+    <main class="map-main">
+      <div id="map" class="map"></div>
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="/map/js/map.js"></script>
+</body>
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>

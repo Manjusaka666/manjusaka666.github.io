@@ -1,0 +1,21 @@
+/* map/css/map.css */
+html,body,#map{height:100%;}
+body{margin:0;font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
+.map-container{display:flex;height:100vh;}
+.map-sidebar{width:320px;padding:16px;background:#fff;border-right:1px solid #eee;box-sizing:border-box;overflow:auto}
+.map-main{flex:1;}
+.map{width:100%;height:100%;}
+.control-group{margin-bottom:12px}
+input[type="text"], input[type="search"], #search-input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+button{padding:6px 10px;margin-left:6px}
+.places-list ul{list-style:none;padding:0;margin:0}
+.places-list li{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f3f3f3}
+.places-list .place-title{flex:1}
+.emoji-icon .emoji-marker{font-size:20px;line-height:32px;text-align:center}
+.leaflet-container .emoji-marker{transform:translateY(-6px)}
+
+@media (max-width:800px){
+  .map-sidebar{width:100%;height:40vh;position:relative}
+  .map-container{flex-direction:column}
+  .map{height:60vh}
+}
