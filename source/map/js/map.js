@@ -629,6 +629,13 @@ const TravelMap = (() => {
     setPlacementMode(false);
     updateCenterPreview();
     loadMarkers();
+    setTimeout(() => {
+      try {
+        s.map?.invalidateSize();
+      } catch (error) {
+        console.warn('Failed to invalidate map size', error);
+      }
+    }, 150);
   }
 
   function destroy() {
@@ -688,6 +695,8 @@ const TravelMap = (() => {
 
   return { init, destroy };
 })();
+
+window.TravelMap = TravelMap;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => TravelMap.init());
