@@ -649,8 +649,8 @@
 	
 
 	
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-sA+z0ymr06P88GJEqn3Ejj6+UeJ8V+RaH59RUW2KIiMzH6I0X58F3RDeo63eNbUsMUKc7tYFAdzZ6Dp3v5V5xQ==" crossorigin="" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-ekS3Y+3CX6XjH9MuNoMNFc13JUO2c+hJ1ytY1/6Yr2vNh+lX6YsJhBKt3vnDnN/SUXOc6BxPw6p6RKF1W/SbQg==" crossorigin="" defer></script>
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>
 ﻿
 <section
   class="travel-map-wrapper px-4 py-10 md:py-14 lg:py-20"
@@ -666,7 +666,7 @@
       <p class="text-base text-[color:var(--color-second-text-color,#666)] dark:text-[color:var(--color-third-text-color,#ccc)]">记录每一次停留，让旅程的故事在这里延续。</p>
     </header>
     <div class="travel-map-grid flex flex-col gap-6 lg:grid lg:grid-cols-[360px,1fr] lg:items-start">
-      <aside class="travel-map-pane space-y-6 rounded-2xl border border-[color:var(--color-border-color,#e5e7eb)] bg-[color:var(--color-second-background-color,#fff)] p-6 shadow-sm dark:border-transparent dark:bg-[color:var(--color-third-background-color,#1f2937)]">
+      <aside class="travel-map-pane space-y-6 rounded-3xl bg-[color:var(--color-second-background-color,#fff)]/70 p-6 backdrop-blur-xl shadow-lg dark:bg-[color:var(--color-third-background-color,#1f2937)]/60">
         <div class="space-y-2">
           <h2 class="text-xl font-semibold text-[color:var(--color-first-text-color,#111)]">地点管理</h2>
           <p class="text-sm text-[color:var(--color-second-text-color,#666)]">搜索、创建和整理你的标记，支持导入导出。</p>
@@ -707,7 +707,7 @@
           </div>
         </div>
       </aside>
-      <div class="travel-map-canvas relative h-[70vh] w-full overflow-hidden rounded-3xl border border-[color:var(--color-border-color,#e5e7eb)] bg-[color:var(--color-second-background-color,#fefefe)] shadow-lg dark:border-transparent dark:bg-[color:var(--color-third-background-color,#111)]">
+      <div class="travel-map-canvas relative h-[70vh] w-full overflow-hidden rounded-3xl bg-[color:var(--color-second-background-color,#fefefe)]/40 backdrop-blur-2xl shadow-xl dark:bg-[color:var(--color-third-background-color,#111)]/40">
         <div id="map" class="absolute inset-0"></div>
         <div class="travel-map-controls pointer-events-none absolute inset-0 flex flex-col justify-between p-6">
           <div class="placement-panel pointer-events-auto max-w-xs rounded-2xl bg-[color:var(--color-second-background-color,#fff)]/95 p-5 shadow-lg ring-1 ring-[color:var(--color-border-color,#e5e7eb)] backdrop-blur">
@@ -723,7 +723,7 @@
       </div>
     </div>
   </div>
-  <script type="module" src="/map/js/map.js" data-swup-reload-script defer></script>
+  <script src="/map/js/map.js" data-swup-reload-script defer></script>
 </section>
 
 	

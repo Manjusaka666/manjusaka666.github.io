@@ -11,7 +11,7 @@
 }
 
 [data-map-page] .travel-map-pane {
-  box-shadow: 0 24px 60px rgba(17, 24, 39, 0.08);
+  box-shadow: none;
 }
 
 #map {
@@ -107,11 +107,16 @@
 }
 
 .travel-map-card {
-  background: var(--travel-surface);
-  border: 1px solid rgba(17, 24, 39, 0.05);
-  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 22px;
   padding: 1rem;
-  box-shadow: 0 18px 45px -30px rgba(17, 24, 39, 0.6);
+  box-shadow: 0 25px 60px -40px rgba(17, 24, 39, 0.6);
+}
+
+[data-theme="dark"] [data-map-page] .travel-map-card {
+  background: rgba(31, 41, 55, 0.68);
+  border-color: rgba(148, 163, 184, 0.18);
 }
 
 .travel-map-search-results {
