@@ -3,6 +3,8 @@ const LEGACY_KEYS = ['my_travel_map_markers_v2', 'my_travel_map_markers'];
 const LEAFLET_JS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
 const LEAFLET_CSS = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
 const MAP_CSS = '/map/css/map.css';
+const DEFAULT_CENTER = [46.2, 6.15];
+const DEFAULT_ZOOM = 12;
 
 let activeLeafletJs = LEAFLET_JS;
 let activeLeafletCss = LEAFLET_CSS;
@@ -453,7 +455,7 @@ const TravelMap = (() => {
     const s = ensureState();
     if (!s.centerPreview || !s.map) return;
     const { lat, lng } = s.map.getCenter();
-    s.centerPreview.textContent = `中心 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    // s.centerPreview.textContent = `中心 ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   }
 
   function setupEventHandlers() {
@@ -543,6 +545,14 @@ const TravelMap = (() => {
       }
     });
 
+    bind(window, 'load', () => {
+      try {
+        s.map?.invalidateSize();
+      } catch (error) {
+        console.warn('Failed to invalidate map size after load', error);
+      }
+    });
+
     bind(s.placesList, 'click', (event) => {
       const actionButton = event.target.closest('[data-action]');
       if (!actionButton) return;
@@ -586,9 +596,9 @@ const TravelMap = (() => {
     if (!mapElement) return;
 
     s.map = L.map(mapElement, { scrollWheelZoom: true, dragging: true });
-    s.map.setView([20, 0], 2);
+    s.map.setView(DEFAULT_CENTER, DEFAULT_ZOOM);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap contributors',
     }).addTo(s.map);
@@ -629,13 +639,15 @@ const TravelMap = (() => {
     setPlacementMode(false);
     updateCenterPreview();
     loadMarkers();
-    setTimeout(() => {
+    const resizeOnce = () => {
       try {
         s.map?.invalidateSize();
       } catch (error) {
         console.warn('Failed to invalidate map size', error);
       }
-    }, 150);
+    };
+    requestAnimationFrame(resizeOnce);
+    setTimeout(resizeOnce, 200);
   }
 
   function destroy() {
