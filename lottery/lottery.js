@@ -46,7 +46,9 @@
   };
 
   const FESTIVAL_FALLBACK_ICONS = ["🧧", "🐴", "✨", "🎊", "🏮", "🎇"];
-  const FESTIVAL_SCREEN_ON_CLASS = "festival-screen-on";
+  const FESTIVAL_SCREEN_ON_ATTR = "data-festival-on";
+  const FESTIVAL_SCREEN_DURATION_MS = 6200;
+  const FESTIVAL_SCREEN_CLEAN_DELAY_MS = 650;
 
   function ensureFullscreenFestivalLayer() {
     const layerId = "horse-lottery-festival-screen";
@@ -125,6 +127,7 @@
         id: item.id || `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
         timestamp: Number(item.timestamp) || Date.now(),
         playerName: String(item.playerName || "神秘朋友"),
+        prizeId: String(item.prizeId || "").slice(0, 12),
         prizeName: String(item.prizeName || "未知奖项"),
         prizeDetail: String(item.prizeDetail || "未填写具体内容"),
       }))
@@ -157,8 +160,29 @@
     return saved && saved.trim() ? saved : DEFAULT_HOST_PIN;
   }
 
-  function pickPrize(pool) {
-    const candidates = pool.filter((item) => item.enabled && item.weight > 0 && item.name.trim());
+  function collectDrawnPrizeIds(records, pool) {
+    const drawn = new Set();
+    const idSet = new Set(pool.map((item) => item.id));
+    const idByName = new Map(pool.map((item) => [item.name, item.id]));
+
+    records.forEach((record) => {
+      const byId = String(record.prizeId || "");
+      if (byId && idSet.has(byId)) {
+        drawn.add(byId);
+        return;
+      }
+      const byName = idByName.get(String(record.prizeName || ""));
+      if (byName) {
+        drawn.add(byName);
+      }
+    });
+    return drawn;
+  }
+
+  function pickPrize(pool, drawnPrizeIds) {
+    const candidates = pool.filter(
+      (item) => item.enabled && item.weight > 0 && item.name.trim() && !drawnPrizeIds.has(item.id)
+    );
     if (!candidates.length) {
       return null;
     }
@@ -173,6 +197,11 @@
       }
     }
     return candidates[candidates.length - 1];
+  }
+
+  function countRemainingDrawablePrizes(pool, drawnPrizeIds) {
+    return pool.filter((item) => item.enabled && item.weight > 0 && item.name.trim() && !drawnPrizeIds.has(item.id))
+      .length;
   }
 
   function normalizeName(name) {
@@ -427,15 +456,53 @@
       if (fullscreenLayer.__fxCleanTimer) {
         window.clearTimeout(fullscreenLayer.__fxCleanTimer);
       }
+      if (fullscreenLayer.__fxGuardInterval) {
+        window.clearInterval(fullscreenLayer.__fxGuardInterval);
+      }
       fullscreenLayer.__fxCloseTimer = 0;
       fullscreenLayer.__fxCleanTimer = 0;
+      fullscreenLayer.__fxGuardInterval = 0;
 
-      fullscreenLayer.classList.remove(FESTIVAL_SCREEN_ON_CLASS);
+      fullscreenLayer.removeAttribute(FESTIVAL_SCREEN_ON_ATTR);
       fullscreenLayer.innerHTML = "";
       // Force style flush so repeated draws restart fullscreen effects immediately.
       void fullscreenLayer.offsetWidth;
-      fullscreenLayer.classList.add(FESTIVAL_SCREEN_ON_CLASS);
+      fullscreenLayer.setAttribute(FESTIVAL_SCREEN_ON_ATTR, "1");
       fullscreenLayer.setAttribute("aria-hidden", "false");
+      fullscreenLayer.style.opacity = "1";
+      fullscreenLayer.style.visibility = "visible";
+      fullscreenLayer.__fxReleaseAt = performance.now() + FESTIVAL_SCREEN_DURATION_MS;
+
+      const keepLayerVisible = () => {
+        if (!document.body.contains(fullscreenLayer)) {
+          if (fullscreenLayer.__fxGuardInterval) {
+            window.clearInterval(fullscreenLayer.__fxGuardInterval);
+            fullscreenLayer.__fxGuardInterval = 0;
+          }
+          return;
+        }
+        if (performance.now() >= (fullscreenLayer.__fxReleaseAt || 0)) {
+          if (fullscreenLayer.__fxGuardInterval) {
+            window.clearInterval(fullscreenLayer.__fxGuardInterval);
+            fullscreenLayer.__fxGuardInterval = 0;
+          }
+          return;
+        }
+        if (fullscreenLayer.getAttribute(FESTIVAL_SCREEN_ON_ATTR) !== "1") {
+          fullscreenLayer.setAttribute(FESTIVAL_SCREEN_ON_ATTR, "1");
+        }
+        if (fullscreenLayer.getAttribute("aria-hidden") !== "false") {
+          fullscreenLayer.setAttribute("aria-hidden", "false");
+        }
+        if (fullscreenLayer.style.opacity !== "1") {
+          fullscreenLayer.style.opacity = "1";
+        }
+        if (fullscreenLayer.style.visibility !== "visible") {
+          fullscreenLayer.style.visibility = "visible";
+        }
+      };
+      keepLayerVisible();
+      fullscreenLayer.__fxGuardInterval = window.setInterval(keepLayerVisible, 120);
 
       const screenFragment = document.createDocumentFragment();
       const fireworkCount = 6;
@@ -475,14 +542,20 @@
       fullscreenLayer.appendChild(screenFragment);
 
       fullscreenLayer.__fxCloseTimer = window.setTimeout(() => {
-        fullscreenLayer.classList.remove(FESTIVAL_SCREEN_ON_CLASS);
+        if (fullscreenLayer.__fxGuardInterval) {
+          window.clearInterval(fullscreenLayer.__fxGuardInterval);
+          fullscreenLayer.__fxGuardInterval = 0;
+        }
+        fullscreenLayer.removeAttribute(FESTIVAL_SCREEN_ON_ATTR);
         fullscreenLayer.setAttribute("aria-hidden", "true");
+        fullscreenLayer.style.opacity = "0";
+        fullscreenLayer.style.visibility = "hidden";
         fullscreenLayer.__fxCloseTimer = 0;
         fullscreenLayer.__fxCleanTimer = window.setTimeout(() => {
           fullscreenLayer.innerHTML = "";
           fullscreenLayer.__fxCleanTimer = 0;
-        }, 420);
-      }, 2300);
+        }, FESTIVAL_SCREEN_CLEAN_DELAY_MS);
+      }, FESTIVAL_SCREEN_DURATION_MS);
     }
 
     resultName.classList.remove("hit");
@@ -595,11 +668,12 @@
         return;
       }
 
-      const picked = pickPrize(pool);
+      const drawnPrizeIds = collectDrawnPrizeIds(records, pool);
+      const picked = pickPrize(pool, drawnPrizeIds);
       if (!picked) {
         resultName.textContent = "奖池暂不可用";
         resultName.style.color = "#b53f5a";
-        setMessage(drawStatus, "当前没有可抽奖项。", "error");
+        setMessage(drawStatus, "奖项已全部抽完。", "error");
         return;
       }
 
@@ -615,6 +689,7 @@
           id: createRecordId(),
           timestamp: Date.now(),
           playerName,
+          prizeId: picked.id,
           prizeName: picked.name,
           prizeDetail: picked.detail,
         },
@@ -624,7 +699,8 @@
       persistRecords(nextRecords);
       renderRecords(recordsList, records);
       const remaining = Math.max(0, 2 - drawCount);
-      setMessage(drawStatus, `${playerName} 抽奖成功，还可抽 ${remaining} 次。`, "success");
+      const remainingPrizeCount = countRemainingDrawablePrizes(pool, collectDrawnPrizeIds(records, pool));
+      setMessage(drawStatus, `${playerName} 抽奖成功，还可抽 ${remaining} 次。剩余奖项 ${remainingPrizeCount} 个。`, "success");
     }
 
     function submitComment() {
