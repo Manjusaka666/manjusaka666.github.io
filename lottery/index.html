@@ -139,8 +139,8 @@
 <meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://manjusaka666.github.io/images/redefine-og.webp">
-<meta property="article:published_time" content="2026-02-16T08:48:08.686Z">
-<meta property="article:modified_time" content="2026-02-16T08:48:08.686Z">
+<meta property="article:published_time" content="2026-02-16T08:58:34.936Z">
+<meta property="article:modified_time" content="2026-02-16T08:58:34.936Z">
 <meta property="article:author" content="Christopher(Jingle Fu)">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://manjusaka666.github.io/images/redefine-og.webp">
@@ -698,7 +698,7 @@
     <header class="horse-lottery-hero">
       <p class="hero-badge">2026 · 马年特别场</p>
       <h1>西西宝贝的马年好运红包礼物超级抽奖机</h1>
-      <p class="hero-subtitle">朋友端只会看到抽中的奖项名称，奖项具体内容由主持人后台可见并可编辑。</p>
+      <p class="hero-subtitle">朋友端只会看到抽中的奖项名称，奖项具体内容由皮皮后台可见并可编辑。</p>
     </header>
 
     <div class="horse-lottery-grid">
@@ -714,11 +714,11 @@
           <p class="result-label">本次抽中</p>
           <p class="result-name" data-role="result-name">等待抽奖中…</p>
         </div>
+        <p class="status-line" data-role="draw-status"></p>
         <div class="festival-layer" data-role="festival-layer" aria-hidden="true"></div>
         <div class="friend-comment-box">
-          <h3>新春留言</h3>
-          <p class="card-tip">留言仅主持人可见，无需邮箱、网址或登录，支持表情。</p>
-          <textarea data-role="friend-comment-input" maxlength="180" placeholder="给西西公主留一句新春祝福…"></textarea>
+          <h3>西西公主给皮皮的留言</h3>
+          <textarea data-role="friend-comment-input" maxlength="180" placeholder="西西公主给皮皮的留言"></textarea>
           <div class="emoji-toolbar">
             <button type="button" data-role="emoji-pick" data-emoji="🧧">🧧</button>
             <button type="button" data-role="emoji-pick" data-emoji="🐴">🐴</button>
@@ -727,21 +727,21 @@
             <button type="button" data-role="emoji-pick" data-emoji="✨">✨</button>
             <button type="button" data-role="emoji-pick" data-emoji="💫">💫</button>
           </div>
-          <button class="ghost-btn" type="button" data-action="send-comment">发送留言给主持人</button>
+          <button class="ghost-btn" type="button" data-action="send-comment">发送留言给皮皮</button>
           <p class="status-line" data-role="comment-status"></p>
         </div>
       </section>
 
       <section class="lottery-card host-card">
         <div class="host-entry">
-          <button class="ghost-btn" type="button" data-action="show-host-auth">主持人入口</button>
-          <p>主持人可查看奖项详情、编辑奖池、查看完整抽奖记录。</p>
+          <button class="ghost-btn" type="button" data-action="show-host-auth">皮皮入口</button>
+          <p>皮皮可查看奖项详情、编辑奖池、查看完整抽奖记录。</p>
         </div>
 
         <div class="host-auth hidden" data-role="host-auth">
-          <label for="lottery-host-pin">主持人口令</label>
+          <label for="lottery-host-pin">皮皮口令</label>
           <div class="host-auth-row">
-            <input id="lottery-host-pin" type="password" maxlength="32" placeholder="请输入主持人口令" />
+            <input id="lottery-host-pin" type="password" maxlength="32" placeholder="请输入皮皮口令" />
             <button class="ghost-btn" type="button" data-action="unlock-host">进入</button>
           </div>
           <p class="auth-msg" data-role="auth-message"></p>
@@ -749,13 +749,13 @@
 
         <div class="host-panel hidden" data-role="host-panel">
           <div class="host-panel-header">
-            <h2>主持人管理台</h2>
-            <button class="ghost-btn" type="button" data-action="lock-host">退出主持模式</button>
+            <h2>皮皮管理台</h2>
+            <button class="ghost-btn" type="button" data-action="lock-host">退出皮皮模式</button>
           </div>
 
           <div class="host-block">
             <h3>奖池设置（8 项）</h3>
-            <p class="card-tip">可修改名称、内容、权重与启用状态。朋友只会看到名称，不会看到内容。</p>
+            <p class="card-tip">可修改名称、内容、权重与启用状态。朋友只会看到名称，不会看到具体内容。</p>
             <div class="pool-editor" data-role="pool-editor"></div>
             <div class="host-actions">
               <button class="primary-btn" type="button" data-action="save-pool">保存奖池设置</button>
@@ -774,7 +774,7 @@
           </div>
 
           <div class="host-block">
-            <h3>新春留言箱</h3>
+            <h3>皮皮留言箱</h3>
             <div class="host-actions">
               <button class="ghost-btn" type="button" data-action="export-comments">导出留言 JSON</button>
               <button class="ghost-btn danger" type="button" data-action="clear-comments">清空留言</button>
@@ -783,10 +783,10 @@
           </div>
 
           <div class="host-block">
-            <h3>主持人口令</h3>
+            <h3>皮皮口令</h3>
             <div class="host-auth-row">
-              <input type="password" maxlength="32" placeholder="设置新口令" data-role="new-pin" />
-              <button class="ghost-btn" type="button" data-action="save-pin">更新口令</button>
+              <input type="password" maxlength="32" placeholder="设置新皮皮口令" data-role="new-pin" />
+              <button class="ghost-btn" type="button" data-action="save-pin">更新皮皮口令</button>
             </div>
             <p class="status-line" data-role="pin-status"></p>
           </div>

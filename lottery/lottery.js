@@ -14,9 +14,9 @@
   const MAX_COMMENTS = 300;
 
   const STORAGE_KEYS = {
-    pool: "horse-lottery-pool-v5",
-    records: "horse-lottery-records-v4",
-    comments: "horse-lottery-comments-v1",
+    pool: "horse-lottery-pool-v6",
+    records: "horse-lottery-records-v5",
+    comments: "horse-lottery-comments-v2",
     hostPin: "horse-lottery-host-pin-v1",
     hostUnlocked: "horse-lottery-host-unlocked-v1",
   };
@@ -24,14 +24,14 @@
   const DEFAULT_HOST_PIN = "pony2026";
 
   const DEFAULT_PRIZE_POOL = [
-    { id: "p01", name: "西西公主马年闪耀礼", detail: "马年好运红包礼物 1 份", weight: 12, enabled: true },
-    { id: "p02", name: "公主的月光幸运礼", detail: "马年好运红包礼物 1 份", weight: 12, enabled: true },
-    { id: "p03", name: "哆哆的跳跳惊喜礼", detail: "马年好运红包礼物 1 份", weight: 12, enabled: true },
-    { id: "p04", name: "西西的云锦轻奢礼", detail: "南京云锦丝巾礼盒 1 份", weight: 13, enabled: true },
-    { id: "p05", name: "公主的秦淮灯彩礼", detail: "秦淮灯彩手作小灯 1 份", weight: 13, enabled: true },
-    { id: "p06", name: "哆哆的金陵折扇礼", detail: "金陵折扇手作礼盒 1 份", weight: 13, enabled: true },
-    { id: "p07", name: "西西的锦绣香囊礼", detail: "南京香囊与流苏挂件套装 1 份", weight: 13, enabled: true },
-    { id: "p08", name: "公主哆哆西西终极礼", detail: "马年好运红包礼物 + 新春纪念周边套装", weight: 12, enabled: true },
+    { id: "p01", name: "公主的星云签", detail: "88.8CHF 红包 1 份（仅皮皮可见）", weight: 12, enabled: true },
+    { id: "p02", name: "哆哆的流光签", detail: "66.6CHF 红包 1 份（仅皮皮可见）", weight: 12, enabled: true },
+    { id: "p03", name: "西西的月影签", detail: "南京云锦丝巾礼盒 1 份", weight: 12, enabled: true },
+    { id: "p04", name: "公主的烟火签", detail: "秦淮灯彩手作小灯 1 份", weight: 13, enabled: true },
+    { id: "p05", name: "哆哆的清风签", detail: "金陵折扇手作礼盒 1 份", weight: 13, enabled: true },
+    { id: "p06", name: "西西的锦绣签", detail: "香囊与流苏挂件套装 1 份", weight: 13, enabled: true },
+    { id: "p07", name: "公主的花灯签", detail: "新春纪念周边套装 1 份", weight: 13, enabled: true },
+    { id: "p08", name: "西西哆哆终极签", detail: "皮皮神秘惊喜礼 1 份", weight: 12, enabled: true },
   ];
 
   const FESTIVAL_EFFECTS = {
@@ -157,6 +157,18 @@
     return candidates[candidates.length - 1];
   }
 
+  function normalizeName(name) {
+    return String(name || "").trim().toLocaleLowerCase();
+  }
+
+  function getDrawCountByName(records, name) {
+    const normalized = normalizeName(name);
+    if (!normalized) {
+      return 0;
+    }
+    return records.filter((item) => normalizeName(item.playerName) === normalized).length;
+  }
+
   function formatTimestamp(value) {
     return new Date(value).toLocaleString("zh-CN", { hour12: false });
   }
@@ -232,7 +244,7 @@
             <input type="text" data-field="name" maxlength="36" value="${escapeHTML(prize.name)}">
           </label>
           <label>
-            具体内容（仅主持人可见）
+            具体内容（仅皮皮可见）
             <textarea data-field="detail" maxlength="240">${escapeHTML(prize.detail)}</textarea>
           </label>
           <label>
@@ -272,7 +284,7 @@
     const filled = nextPool.map((item, index) => ({
       ...item,
       name: item.name || `神秘奖项 ${index + 1}`,
-      detail: item.detail || "待主持人补充",
+      detail: item.detail || "待皮皮补充",
     }));
 
     return { pool: filled };
@@ -408,6 +420,7 @@
     const playerInput = app.querySelector("#lottery-player-name");
     const drawButton = app.querySelector('[data-action="draw"]');
     const resultName = app.querySelector('[data-role="result-name"]');
+    const drawStatus = app.querySelector('[data-role="draw-status"]');
     const drawResultBox = app.querySelector(".draw-result");
     const festivalLayer = app.querySelector('[data-role="festival-layer"]');
 
@@ -474,7 +487,7 @@
         sessionStorage.setItem(STORAGE_KEYS.hostUnlocked, "1");
         hostPanel?.classList.remove("hidden");
         hostAuth?.classList.add("hidden");
-        setMessage(authMessage, "已进入主持模式。", "success");
+        setMessage(authMessage, "已进入皮皮模式。", "success");
         refreshHostLists();
       } else {
         sessionStorage.removeItem(STORAGE_KEYS.hostUnlocked);
@@ -483,14 +496,26 @@
     }
 
     function drawOnce() {
+      const playerName = String(playerInput?.value || "").trim();
+      if (!playerName) {
+        setMessage(drawStatus, "请输入昵称后再抽奖。", "error");
+        return;
+      }
+
+      const drawCount = getDrawCountByName(records, playerName);
+      if (drawCount >= 3) {
+        setMessage(drawStatus, `${playerName} 已抽满 3 次。`, "error");
+        return;
+      }
+
       const picked = pickPrize(pool);
       if (!picked) {
         resultName.textContent = "奖池暂不可用";
         resultName.style.color = "#b53f5a";
+        setMessage(drawStatus, "当前没有可抽奖项。", "error");
         return;
       }
 
-      const playerName = playerInput?.value?.trim() || "神秘朋友";
       resultName.textContent = picked.name;
       resultName.style.color = "";
       playFestivalAnimation(festivalLayer, resultName, drawResultBox, picked.id);
@@ -508,6 +533,8 @@
 
       persistRecords(nextRecords);
       renderRecords(recordsList, records);
+      const remaining = Math.max(0, 2 - drawCount);
+      setMessage(drawStatus, `${playerName} 抽奖成功，还可抽 ${remaining} 次。`, "success");
     }
 
     function submitComment() {
@@ -533,7 +560,7 @@
       if (friendCommentInput) {
         friendCommentInput.value = "";
       }
-      setMessage(friendCommentStatus, "留言已送达主持人留言箱。", "success");
+      setMessage(friendCommentStatus, "留言已送达皮皮留言箱。", "success");
     }
 
     drawButton.addEventListener("click", drawOnce);
@@ -576,7 +603,7 @@
       const currentPin = loadHostPin();
       const inputPin = hostPinInput?.value?.trim() || "";
       if (!inputPin) {
-        setMessage(authMessage, "请输入主持人口令。", "error");
+        setMessage(authMessage, "请输入皮皮口令。", "error");
         return;
       }
       if (inputPin !== currentPin) {
@@ -591,7 +618,7 @@
 
     lockButton?.addEventListener("click", () => {
       showHostPanel(false);
-      setMessage(authMessage, "已退出主持模式。");
+      setMessage(authMessage, "已退出皮皮模式。");
     });
 
     savePoolButton?.addEventListener("click", () => {
@@ -657,14 +684,14 @@
     savePinButton?.addEventListener("click", () => {
       const nextPin = newPinInput?.value?.trim() || "";
       if (nextPin.length < 4) {
-        setMessage(pinStatus, "新口令至少 4 位。", "error");
+        setMessage(pinStatus, "新皮皮口令至少 4 位。", "error");
         return;
       }
       localStorage.setItem(STORAGE_KEYS.hostPin, nextPin);
       if (newPinInput) {
         newPinInput.value = "";
       }
-      setMessage(pinStatus, "主持人口令已更新。", "success");
+      setMessage(pinStatus, "皮皮口令已更新。", "success");
     });
 
     if (hostUnlocked) {
