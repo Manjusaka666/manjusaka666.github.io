@@ -1,0 +1,442 @@
+@import url("../fonts/Chillax/chillax.css");
+@import url("../fonts/Geist/geist.css");
+
+.page-template-content.markdown-body > h1:first-of-type {
+  display: none;
+}
+
+.horse-lottery-page {
+  --horse-bg-1: #fffdf6;
+  --horse-bg-2: #f2f7ff;
+  --horse-accent: #ff7f50;
+  --horse-accent-deep: #ea5b2f;
+  --horse-mint: #44bba4;
+  --horse-ink: #2c3040;
+  --horse-subtle: #64708a;
+  --horse-glass: rgba(255, 255, 255, 0.72);
+  --horse-border: rgba(255, 255, 255, 0.88);
+  --horse-shadow: 0 20px 45px rgba(70, 84, 126, 0.15);
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding: clamp(1rem, 2.2vw, 2rem);
+  background:
+    radial-gradient(140% 100% at 0% 0%, #fff5dd 0%, transparent 55%),
+    radial-gradient(120% 120% at 100% 10%, #dff3ff 0%, transparent 54%),
+    linear-gradient(140deg, var(--horse-bg-1) 0%, var(--horse-bg-2) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.horse-lottery-page::before,
+.horse-lottery-page::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(2px);
+  opacity: 0.75;
+}
+
+.horse-lottery-page::before {
+  width: 240px;
+  height: 240px;
+  right: -90px;
+  top: -110px;
+  background: radial-gradient(circle at 30% 30%, #ffd9bd 0%, #ffd9bd 18%, #ffc4c8 58%, rgba(255, 196, 200, 0) 100%);
+  animation: horse-float 9s ease-in-out infinite;
+}
+
+.horse-lottery-page::after {
+  width: 220px;
+  height: 220px;
+  left: -120px;
+  bottom: -120px;
+  background: radial-gradient(circle at 40% 30%, #d2f9ed 0%, #d2f9ed 22%, #b8dfff 62%, rgba(184, 223, 255, 0) 100%);
+  animation: horse-float 10s ease-in-out infinite reverse;
+}
+
+.horse-lottery-shell {
+  position: relative;
+  z-index: 2;
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  gap: 1rem;
+}
+
+.horse-lottery-hero {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.35rem 0.2rem;
+}
+
+.horse-lottery-hero h1 {
+  margin: 0;
+  font-family: "Chillax", "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: clamp(1.75rem, 2.9vw, 2.45rem);
+  color: var(--horse-ink);
+  letter-spacing: 0.03em;
+  text-wrap: balance;
+}
+
+.hero-badge {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--horse-accent-deep);
+  font-weight: 700;
+}
+
+.hero-subtitle {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.horse-lottery-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 940px) {
+  .horse-lottery-grid {
+    grid-template-columns: minmax(260px, 360px) 1fr;
+  }
+}
+
+.lottery-card {
+  border: 1px solid var(--horse-border);
+  background: var(--horse-glass);
+  box-shadow: var(--horse-shadow);
+  border-radius: 22px;
+  backdrop-filter: blur(16px) saturate(130%);
+  -webkit-backdrop-filter: blur(16px) saturate(130%);
+  padding: clamp(1rem, 2vw, 1.4rem);
+  animation: horse-card-in 400ms ease both;
+}
+
+.draw-card {
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+}
+
+.draw-card h2,
+.host-panel h2,
+.host-panel h3 {
+  margin: 0;
+  color: var(--horse-ink);
+  font-family: "Chillax", "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+}
+
+.card-tip {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.9rem;
+}
+
+.draw-form {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.draw-form label {
+  color: var(--horse-subtle);
+  font-size: 0.82rem;
+}
+
+.horse-lottery-page input,
+.horse-lottery-page textarea {
+  width: 100%;
+  border: 1px solid rgba(124, 136, 164, 0.3);
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.62rem 0.72rem;
+  color: var(--horse-ink);
+  font-family: "Geist", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.horse-lottery-page textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.horse-lottery-page input:focus,
+.horse-lottery-page textarea:focus {
+  outline: none;
+  border-color: rgba(68, 187, 164, 0.75);
+  box-shadow: 0 0 0 3px rgba(68, 187, 164, 0.18);
+}
+
+.primary-btn,
+.ghost-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 0.66rem 0.95rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: "Geist", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+}
+
+.primary-btn {
+  color: #fff;
+  background: linear-gradient(135deg, var(--horse-accent) 0%, var(--horse-accent-deep) 100%);
+  box-shadow: 0 10px 18px rgba(234, 91, 47, 0.3);
+}
+
+.primary-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+
+.primary-btn:active {
+  transform: translateY(1px);
+}
+
+.ghost-btn {
+  color: var(--horse-ink);
+  border: 1px solid rgba(117, 134, 162, 0.34);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.ghost-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 16px rgba(84, 103, 140, 0.14);
+}
+
+.ghost-btn.danger {
+  color: #a8324b;
+}
+
+.draw-result {
+  margin-top: 0.2rem;
+  border-radius: 16px;
+  padding: 0.8rem 0.95rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(255, 245, 236, 0.95));
+  border: 1px solid rgba(255, 208, 170, 0.5);
+}
+
+.result-label {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.8rem;
+}
+
+.result-name {
+  margin: 0.28rem 0 0;
+  font-size: 1.36rem;
+  color: var(--horse-accent-deep);
+  font-family: "Chillax", "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  letter-spacing: 0.03em;
+}
+
+.host-card {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.host-entry {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.host-entry p {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.host-auth {
+  display: grid;
+  gap: 0.42rem;
+  padding-top: 0.2rem;
+}
+
+.host-auth label {
+  color: var(--horse-subtle);
+  font-size: 0.82rem;
+}
+
+.host-auth-row {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.auth-msg,
+.status-line {
+  margin: 0;
+  min-height: 1.25em;
+  color: var(--horse-subtle);
+  font-size: 0.82rem;
+}
+
+.auth-msg.error,
+.status-line.error {
+  color: #b53f5a;
+}
+
+.auth-msg.success,
+.status-line.success {
+  color: #0d8a6f;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.host-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.host-panel-header {
+  display: flex;
+  gap: 0.7rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.host-block {
+  border: 1px solid rgba(138, 155, 182, 0.3);
+  border-radius: 16px;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.56);
+  display: grid;
+  gap: 0.6rem;
+}
+
+.pool-editor {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.pool-item {
+  border: 1px solid rgba(159, 173, 196, 0.28);
+  border-radius: 12px;
+  padding: 0.68rem;
+  background: rgba(255, 255, 255, 0.82);
+  display: grid;
+  gap: 0.54rem;
+}
+
+.pool-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pool-item-index {
+  font-size: 0.78rem;
+  color: var(--horse-subtle);
+  font-weight: 700;
+}
+
+.pool-item-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  font-size: 0.78rem;
+  color: var(--horse-subtle);
+}
+
+.pool-item-toggle input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--horse-mint);
+}
+
+.pool-field-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.pool-field-grid label {
+  display: grid;
+  gap: 0.25rem;
+  color: var(--horse-subtle);
+  font-size: 0.78rem;
+}
+
+.pool-item input[type="number"] {
+  max-width: 120px;
+}
+
+.host-actions {
+  display: flex;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.record-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.record-list-item {
+  border-radius: 12px;
+  padding: 0.62rem 0.7rem;
+  border: 1px solid rgba(150, 165, 192, 0.28);
+  background: rgba(255, 255, 255, 0.78);
+  display: grid;
+  gap: 0.24rem;
+}
+
+.record-main {
+  margin: 0;
+  color: var(--horse-ink);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.record-meta {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.76rem;
+}
+
+.record-empty {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 560px) {
+  .host-auth-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@keyframes horse-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes horse-card-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
