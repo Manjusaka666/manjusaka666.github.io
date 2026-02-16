@@ -14,7 +14,7 @@
   const MAX_COMMENTS = 300;
 
   const STORAGE_KEYS = {
-    pool: "horse-lottery-pool-v4",
+    pool: "horse-lottery-pool-v5",
     records: "horse-lottery-records-v4",
     comments: "horse-lottery-comments-v1",
     hostPin: "horse-lottery-host-pin-v1",
