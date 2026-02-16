@@ -13,8 +13,8 @@
   const MAX_RECORDS = 300;
 
   const STORAGE_KEYS = {
-    pool: "horse-lottery-pool-v2",
-    records: "horse-lottery-records-v2",
+    pool: "horse-lottery-pool-v3",
+    records: "horse-lottery-records-v3",
     hostPin: "horse-lottery-host-pin-v1",
     hostUnlocked: "horse-lottery-host-unlocked-v1",
   };
@@ -22,16 +22,16 @@
   const DEFAULT_HOST_PIN = "pony2026";
 
   const DEFAULT_PRIZE_POOL = [
-    { id: "p01", name: "公主的星闪红包", detail: "88.8 CHF 红包 1 份", weight: 6, enabled: true },
-    { id: "p02", name: "哆哆的好运红包", detail: "66.6 CHF 红包 1 份", weight: 10, enabled: true },
-    { id: "p03", name: "西西的双倍开心包", detail: "66.6 CHF 红包 1 份 + 新奶奶专属祝福卡", weight: 8, enabled: true },
-    { id: "p04", name: "公主的金陵鸭鸭礼", detail: "南京盐水鸭精品礼盒（约 72 CHF）", weight: 11, enabled: true },
-    { id: "p05", name: "哆哆的云锦软软礼", detail: "南京云锦丝巾文创款（约 86 CHF）", weight: 9, enabled: true },
-    { id: "p06", name: "西西的雨花石心愿盒", detail: "南京雨花石文创摆件套盒（约 69 CHF）", weight: 11, enabled: true },
-    { id: "p07", name: "公主的秦淮灯彩夜", detail: "秦淮灯彩手作小灯礼盒（约 78 CHF）", weight: 10, enabled: true },
-    { id: "p08", name: "哆哆的金陵折扇风", detail: "金陵折扇 + 香囊伴手礼套组（约 66 CHF）", weight: 11, enabled: true },
-    { id: "p09", name: "西西的甜桂花礼袋", detail: "南京桂花糕点礼盒 + 桂花乌龙茶（约 68 CHF）", weight: 12, enabled: true },
-    { id: "p10", name: "公主哆哆西西终极彩蛋", detail: "88.8 CHF 红包 1 份 + 南京博物院文创盲盒（约 22 CHF）", weight: 5, enabled: true },
+    { id: "p01", name: "公主的星光好运包", detail: "马年好运红包礼物 1 份", weight: 9, enabled: true },
+    { id: "p02", name: "哆哆的跳跳好运包", detail: "马年好运红包礼物 1 份", weight: 10, enabled: true },
+    { id: "p03", name: "西西的绵绵好运包", detail: "马年好运红包礼物 1 份 + 专属祝福卡", weight: 9, enabled: true },
+    { id: "p04", name: "公主的云锦丝巾礼", detail: "南京云锦丝巾礼盒 1 份", weight: 10, enabled: true },
+    { id: "p05", name: "哆哆的雨花石愿望礼", detail: "南京雨花石文创摆件礼盒 1 份", weight: 10, enabled: true },
+    { id: "p06", name: "西西的金陵折扇礼", detail: "金陵折扇手作礼盒 1 份", weight: 10, enabled: true },
+    { id: "p07", name: "公主的秦淮灯彩礼", detail: "秦淮灯彩手作小灯 1 份", weight: 10, enabled: true },
+    { id: "p08", name: "哆哆的香囊平安礼", detail: "南京香囊与流苏挂件套装 1 份", weight: 11, enabled: true },
+    { id: "p09", name: "西西的文具心愿礼", detail: "高颜值手帐文具礼盒 1 份", weight: 11, enabled: true },
+    { id: "p10", name: "公主哆哆西西终极礼", detail: "马年好运红包礼物 + 新春纪念周边套装", weight: 10, enabled: true },
   ];
 
   function cloneDefaultPool() {
