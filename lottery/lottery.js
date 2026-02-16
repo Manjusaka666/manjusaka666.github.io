@@ -45,6 +45,23 @@
     p08: { icons: ["🧧", "🎉", "🐴", "🎇"] },
   };
 
+  const FESTIVAL_FALLBACK_ICONS = ["🧧", "🐴", "✨", "🎊", "🏮", "🎇"];
+
+  function ensureFullscreenFestivalLayer() {
+    const layerId = "horse-lottery-festival-screen";
+    let layer = document.getElementById(layerId);
+    if (layer) {
+      return layer;
+    }
+
+    layer = document.createElement("div");
+    layer.id = layerId;
+    layer.className = "festival-screen";
+    layer.setAttribute("aria-hidden", "true");
+    document.body.appendChild(layer);
+    return layer;
+  }
+
   function cloneDefaultPool() {
     return DEFAULT_PRIZE_POOL.map((item) => ({ ...item }));
   }
@@ -359,45 +376,108 @@
     textarea.selectionEnd = nextPos;
   }
 
-  function playFestivalAnimation(layer, resultName, resultBox, prizeId) {
-    if (!layer || !resultName || !resultBox) {
+  function playFestivalAnimation(layer, fullscreenLayer, resultName, resultBox, prizeId) {
+    if (!resultName || !resultBox) {
       return;
     }
 
-    const effect = FESTIVAL_EFFECTS[prizeId] || { icons: ["🧧", "🐴", "✨", "🎊"] };
-    const centerX = 45 + Math.random() * 10;
-    const centerY = 38 + Math.random() * 14;
-    const total = 26;
+    const effect = FESTIVAL_EFFECTS[prizeId] || { icons: FESTIVAL_FALLBACK_ICONS };
+    const icons = Array.isArray(effect.icons) && effect.icons.length ? effect.icons : FESTIVAL_FALLBACK_ICONS;
 
-    layer.innerHTML = "";
-    const fragment = document.createDocumentFragment();
+    if (layer) {
+      const centerX = 45 + Math.random() * 10;
+      const centerY = 38 + Math.random() * 14;
+      const total = 26;
+      layer.innerHTML = "";
+      const burstFragment = document.createDocumentFragment();
 
-    for (let i = 0; i < total; i += 1) {
-      const node = document.createElement("span");
-      node.className = "festival-burst";
-      node.textContent = effect.icons[i % effect.icons.length];
+      for (let i = 0; i < total; i += 1) {
+        const node = document.createElement("span");
+        node.className = "festival-burst";
+        node.textContent = icons[i % icons.length];
 
-      const angle = (Math.PI * 2 * i) / total + (Math.random() - 0.5) * 0.18;
-      const distance = 64 + Math.random() * 118;
-      const tx = Math.cos(angle) * distance;
-      const ty = Math.sin(angle) * distance - 36;
-      const rotate = `${-90 + Math.random() * 180}deg`;
-      const size = `${1.05 + Math.random() * 0.8}rem`;
+        const angle = (Math.PI * 2 * i) / total + (Math.random() - 0.5) * 0.18;
+        const distance = 64 + Math.random() * 118;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance - 36;
+        const rotate = `${-90 + Math.random() * 180}deg`;
+        const size = `${1.05 + Math.random() * 0.8}rem`;
 
-      node.style.setProperty("--fx", `${centerX}%`);
-      node.style.setProperty("--fy", `${centerY}%`);
-      node.style.setProperty("--tx", `${tx.toFixed(1)}px`);
-      node.style.setProperty("--ty", `${ty.toFixed(1)}px`);
-      node.style.setProperty("--tr", rotate);
-      node.style.setProperty("--fs", size);
-      node.style.animationDelay = `${Math.random() * 120}ms`;
-      fragment.appendChild(node);
+        node.style.setProperty("--fx", `${centerX}%`);
+        node.style.setProperty("--fy", `${centerY}%`);
+        node.style.setProperty("--tx", `${tx.toFixed(1)}px`);
+        node.style.setProperty("--ty", `${ty.toFixed(1)}px`);
+        node.style.setProperty("--tr", rotate);
+        node.style.setProperty("--fs", size);
+        node.style.animationDelay = `${Math.random() * 120}ms`;
+        burstFragment.appendChild(node);
+      }
+
+      layer.appendChild(burstFragment);
+      window.setTimeout(() => {
+        layer.innerHTML = "";
+      }, 1400);
     }
 
-    layer.appendChild(fragment);
-    window.setTimeout(() => {
-      layer.innerHTML = "";
-    }, 1400);
+    if (fullscreenLayer) {
+      if (fullscreenLayer.__fxCloseTimer) {
+        window.clearTimeout(fullscreenLayer.__fxCloseTimer);
+      }
+      if (fullscreenLayer.__fxCleanTimer) {
+        window.clearTimeout(fullscreenLayer.__fxCleanTimer);
+      }
+
+      fullscreenLayer.innerHTML = "";
+      fullscreenLayer.classList.add("active");
+      fullscreenLayer.setAttribute("aria-hidden", "false");
+
+      const screenFragment = document.createDocumentFragment();
+      const fireworkCount = 6;
+      const sparksPerFirework = 18;
+
+      for (let i = 0; i < fireworkCount; i += 1) {
+        const shell = document.createElement("div");
+        shell.className = "screen-firework";
+        shell.style.setProperty("--x", `${12 + Math.random() * 76}%`);
+        shell.style.setProperty("--y", `${12 + Math.random() * 44}%`);
+        shell.style.setProperty("--delay", `${i * 120 + Math.random() * 90}ms`);
+        shell.style.setProperty("--hue", String(14 + Math.floor(Math.random() * 28)));
+
+        for (let j = 0; j < sparksPerFirework; j += 1) {
+          const spark = document.createElement("span");
+          spark.className = "screen-spark";
+          spark.textContent = icons[(i * 2 + j) % icons.length];
+          spark.style.setProperty("--angle", `${(360 / sparksPerFirework) * j + (Math.random() - 0.5) * 10}deg`);
+          spark.style.setProperty("--travel", `${84 + Math.random() * 118}px`);
+          spark.style.setProperty("--spark-delay", `${Math.random() * 160}ms`);
+          spark.style.fontSize = `${0.92 + Math.random() * 0.65}rem`;
+          shell.appendChild(spark);
+        }
+        screenFragment.appendChild(shell);
+      }
+
+      const parade = document.createElement("div");
+      parade.className = "horse-parade";
+      ["🐴", "🏮", "🧧", "✨", "🐎", "🎇", "🧨", "🏮"].forEach((icon, index) => {
+        const token = document.createElement("span");
+        token.className = "horse-parade-icon";
+        token.textContent = icon;
+        token.style.animationDelay = `${index * 90}ms`;
+        parade.appendChild(token);
+      });
+      screenFragment.appendChild(parade);
+      fullscreenLayer.appendChild(screenFragment);
+
+      fullscreenLayer.__fxCloseTimer = window.setTimeout(() => {
+        fullscreenLayer.classList.remove("active");
+        fullscreenLayer.setAttribute("aria-hidden", "true");
+        fullscreenLayer.__fxCloseTimer = 0;
+        fullscreenLayer.__fxCleanTimer = window.setTimeout(() => {
+          fullscreenLayer.innerHTML = "";
+          fullscreenLayer.__fxCleanTimer = 0;
+        }, 420);
+      }, 2300);
+    }
 
     resultName.classList.remove("hit");
     resultBox.classList.remove("hit");
@@ -423,6 +503,7 @@
     const drawStatus = app.querySelector('[data-role="draw-status"]');
     const drawResultBox = app.querySelector(".draw-result");
     const festivalLayer = app.querySelector('[data-role="festival-layer"]');
+    const fullscreenFestivalLayer = ensureFullscreenFestivalLayer();
 
     const friendCommentInput = app.querySelector('[data-role="friend-comment-input"]');
     const friendCommentStatus = app.querySelector('[data-role="comment-status"]');
@@ -518,7 +599,7 @@
 
       resultName.textContent = picked.name;
       resultName.style.color = "";
-      playFestivalAnimation(festivalLayer, resultName, drawResultBox, picked.id);
+      playFestivalAnimation(festivalLayer, fullscreenFestivalLayer, resultName, drawResultBox, picked.id);
 
       const nextRecords = [
         {

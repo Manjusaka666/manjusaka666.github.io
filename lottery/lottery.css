@@ -308,6 +308,94 @@
   filter: drop-shadow(0 6px 12px rgba(192, 45, 58, 0.25));
 }
 
+.festival-screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.festival-screen::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(46% 34% at 50% 22%, rgba(255, 217, 154, 0.42) 0%, rgba(255, 217, 154, 0) 74%),
+    radial-gradient(54% 40% at 24% 34%, rgba(255, 111, 111, 0.22) 0%, rgba(255, 111, 111, 0) 72%),
+    radial-gradient(52% 42% at 78% 30%, rgba(255, 168, 99, 0.24) 0%, rgba(255, 168, 99, 0) 72%);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.festival-screen.active {
+  opacity: 1;
+}
+
+.festival-screen.active::before {
+  opacity: 1;
+}
+
+.screen-firework {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 35%);
+  width: 1px;
+  height: 1px;
+}
+
+.screen-firework::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) scale(0.35);
+  opacity: 0;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.95) 0%,
+    hsla(var(--hue, 20), 95%, 60%, 0.92) 38%,
+    rgba(255, 91, 0, 0) 76%
+  );
+  filter: drop-shadow(0 0 20px rgba(255, 140, 78, 0.5));
+  animation: festival-screen-core 1280ms ease-out var(--delay, 0ms) forwards;
+}
+
+.screen-spark {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(0) scale(0.55);
+  opacity: 0;
+  filter: drop-shadow(0 6px 14px rgba(32, 22, 26, 0.34));
+  animation: festival-screen-spark 1320ms cubic-bezier(0.2, 0.95, 0.28, 1)
+    calc(var(--delay, 0ms) + var(--spark-delay, 0ms)) forwards;
+}
+
+.horse-parade {
+  position: absolute;
+  left: -14%;
+  right: -14%;
+  bottom: 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0;
+  animation: horse-parade-drift 2200ms linear 90ms forwards;
+}
+
+.horse-parade-icon {
+  font-size: clamp(1.1rem, 2.5vw, 1.95rem);
+  transform: translateY(0);
+  filter: drop-shadow(0 8px 18px rgba(130, 37, 27, 0.3));
+  animation: horse-parade-bob 560ms ease-in-out infinite;
+}
+
 .host-card {
   display: grid;
   gap: 0.95rem;
@@ -589,5 +677,73 @@
     opacity: 0;
     transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, -120px)))
       scale(1.1) rotate(var(--tr, 45deg));
+  }
+}
+
+@keyframes festival-screen-core {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.95);
+  }
+}
+
+@keyframes festival-screen-spark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(0) scale(0.55);
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--angle, 0deg)) translateY(calc(var(--travel, 120px) * -1))
+      scale(1.05);
+  }
+}
+
+@keyframes horse-parade-drift {
+  0% {
+    opacity: 0;
+    transform: translateX(-6%) translateY(8px);
+  }
+  12% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(14%) translateY(-6px);
+  }
+}
+
+@keyframes horse-parade-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .festival-screen,
+  .festival-screen::before,
+  .screen-firework::before,
+  .screen-spark,
+  .horse-parade,
+  .horse-parade-icon {
+    animation: none !important;
+    transition: none !important;
   }
 }
