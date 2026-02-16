@@ -46,6 +46,7 @@
   };
 
   const FESTIVAL_FALLBACK_ICONS = ["🧧", "🐴", "✨", "🎊", "🏮", "🎇"];
+  const FESTIVAL_SCREEN_ON_CLASS = "festival-screen-on";
 
   function ensureFullscreenFestivalLayer() {
     const layerId = "horse-lottery-festival-screen";
@@ -426,9 +427,14 @@
       if (fullscreenLayer.__fxCleanTimer) {
         window.clearTimeout(fullscreenLayer.__fxCleanTimer);
       }
+      fullscreenLayer.__fxCloseTimer = 0;
+      fullscreenLayer.__fxCleanTimer = 0;
 
+      fullscreenLayer.classList.remove(FESTIVAL_SCREEN_ON_CLASS);
       fullscreenLayer.innerHTML = "";
-      fullscreenLayer.classList.add("active");
+      // Force style flush so repeated draws restart fullscreen effects immediately.
+      void fullscreenLayer.offsetWidth;
+      fullscreenLayer.classList.add(FESTIVAL_SCREEN_ON_CLASS);
       fullscreenLayer.setAttribute("aria-hidden", "false");
 
       const screenFragment = document.createDocumentFragment();
@@ -469,7 +475,7 @@
       fullscreenLayer.appendChild(screenFragment);
 
       fullscreenLayer.__fxCloseTimer = window.setTimeout(() => {
-        fullscreenLayer.classList.remove("active");
+        fullscreenLayer.classList.remove(FESTIVAL_SCREEN_ON_CLASS);
         fullscreenLayer.setAttribute("aria-hidden", "true");
         fullscreenLayer.__fxCloseTimer = 0;
         fullscreenLayer.__fxCleanTimer = window.setTimeout(() => {
@@ -503,7 +509,7 @@
     const drawStatus = app.querySelector('[data-role="draw-status"]');
     const drawResultBox = app.querySelector(".draw-result");
     const festivalLayer = app.querySelector('[data-role="festival-layer"]');
-    const fullscreenFestivalLayer = ensureFullscreenFestivalLayer();
+    let fullscreenFestivalLayer = ensureFullscreenFestivalLayer();
 
     const friendCommentInput = app.querySelector('[data-role="friend-comment-input"]');
     const friendCommentStatus = app.querySelector('[data-role="comment-status"]');
@@ -599,6 +605,9 @@
 
       resultName.textContent = picked.name;
       resultName.style.color = "";
+      if (!fullscreenFestivalLayer || !document.body.contains(fullscreenFestivalLayer)) {
+        fullscreenFestivalLayer = ensureFullscreenFestivalLayer();
+      }
       playFestivalAnimation(festivalLayer, fullscreenFestivalLayer, resultName, drawResultBox, picked.id);
 
       const nextRecords = [
