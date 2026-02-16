@@ -103,7 +103,8 @@
 
 @media (min-width: 940px) {
   .horse-lottery-grid {
-    grid-template-columns: minmax(260px, 360px) 1fr;
+    grid-template-columns: 1.45fr 0.95fr;
+    align-items: start;
   }
 }
 
@@ -119,6 +120,8 @@
 }
 
 .draw-card {
+  position: relative;
+  overflow: hidden;
   display: grid;
   align-content: start;
   gap: 0.9rem;
@@ -223,6 +226,10 @@
   border: 1px solid rgba(255, 208, 170, 0.5);
 }
 
+.draw-result.hit {
+  animation: lucky-pulse 560ms ease;
+}
+
 .result-label {
   margin: 0;
   color: var(--horse-subtle);
@@ -235,6 +242,70 @@
   color: var(--horse-accent-deep);
   font-family: "Chillax", "Avenir Next", "PingFang SC", "Hiragino Sans GB", sans-serif;
   letter-spacing: 0.03em;
+}
+
+.result-name.hit {
+  animation: lucky-shine 750ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.friend-comment-box {
+  border-radius: 14px;
+  border: 1px solid rgba(164, 177, 204, 0.35);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.72rem;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.friend-comment-box h3 {
+  margin: 0;
+  color: var(--horse-ink);
+  font-size: 1rem;
+}
+
+.friend-comment-box textarea {
+  min-height: 78px;
+}
+
+.emoji-toolbar {
+  display: flex;
+  gap: 0.42rem;
+  flex-wrap: wrap;
+}
+
+.emoji-toolbar button {
+  border: 1px solid rgba(158, 172, 199, 0.38);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 0.2rem 0.45rem;
+  line-height: 1;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease;
+}
+
+.emoji-toolbar button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 14px rgba(91, 107, 139, 0.18);
+}
+
+.festival-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 4;
+}
+
+.festival-burst {
+  position: absolute;
+  left: var(--fx, 50%);
+  top: var(--fy, 40%);
+  transform: translate(-50%, -50%);
+  font-size: var(--fs, 1.4rem);
+  opacity: 0;
+  animation: festival-burst 1180ms ease-out forwards;
+  filter: drop-shadow(0 6px 12px rgba(192, 45, 58, 0.25));
 }
 
 .host-card {
@@ -414,6 +485,44 @@
   font-size: 0.84rem;
 }
 
+.comment-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.comment-list-item {
+  border-radius: 12px;
+  padding: 0.62rem 0.7rem;
+  border: 1px solid rgba(150, 165, 192, 0.28);
+  background: rgba(255, 255, 255, 0.78);
+  display: grid;
+  gap: 0.24rem;
+}
+
+.comment-main {
+  margin: 0;
+  color: var(--horse-ink);
+  font-size: 0.86rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.comment-meta {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.76rem;
+}
+
+.comment-empty {
+  margin: 0;
+  color: var(--horse-subtle);
+  font-size: 0.84rem;
+}
+
 @media (max-width: 560px) {
   .host-auth-row {
     grid-template-columns: 1fr;
@@ -438,5 +547,47 @@
   to {
     transform: translateY(0);
     opacity: 1;
+  }
+}
+
+@keyframes lucky-pulse {
+  0% {
+    box-shadow: 0 0 0 rgba(255, 139, 77, 0);
+  }
+  45% {
+    box-shadow: 0 0 0 7px rgba(255, 139, 77, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(255, 139, 77, 0);
+  }
+}
+
+@keyframes lucky-shine {
+  0% {
+    transform: translateY(2px) scale(0.92);
+    opacity: 0.5;
+  }
+  55% {
+    transform: translateY(-1px) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes festival-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -35%) scale(0.4) rotate(0deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, -120px)))
+      scale(1.1) rotate(var(--tr, 45deg));
   }
 }

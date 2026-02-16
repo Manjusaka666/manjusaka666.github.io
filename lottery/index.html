@@ -139,8 +139,8 @@
 <meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://manjusaka666.github.io/images/redefine-og.webp">
-<meta property="article:published_time" content="2026-02-16T08:28:45.692Z">
-<meta property="article:modified_time" content="2026-02-16T08:28:45.692Z">
+<meta property="article:published_time" content="2026-02-16T08:48:08.686Z">
+<meta property="article:modified_time" content="2026-02-16T08:48:08.686Z">
 <meta property="article:author" content="Christopher(Jingle Fu)">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://manjusaka666.github.io/images/redefine-og.webp">
@@ -714,6 +714,22 @@
           <p class="result-label">本次抽中</p>
           <p class="result-name" data-role="result-name">等待抽奖中…</p>
         </div>
+        <div class="festival-layer" data-role="festival-layer" aria-hidden="true"></div>
+        <div class="friend-comment-box">
+          <h3>新春留言</h3>
+          <p class="card-tip">留言仅主持人可见，无需邮箱、网址或登录，支持表情。</p>
+          <textarea data-role="friend-comment-input" maxlength="180" placeholder="给西西公主留一句新春祝福…"></textarea>
+          <div class="emoji-toolbar">
+            <button type="button" data-role="emoji-pick" data-emoji="🧧">🧧</button>
+            <button type="button" data-role="emoji-pick" data-emoji="🐴">🐴</button>
+            <button type="button" data-role="emoji-pick" data-emoji="🏮">🏮</button>
+            <button type="button" data-role="emoji-pick" data-emoji="🎊">🎊</button>
+            <button type="button" data-role="emoji-pick" data-emoji="✨">✨</button>
+            <button type="button" data-role="emoji-pick" data-emoji="💫">💫</button>
+          </div>
+          <button class="ghost-btn" type="button" data-action="send-comment">发送留言给主持人</button>
+          <p class="status-line" data-role="comment-status"></p>
+        </div>
       </section>
 
       <section class="lottery-card host-card">
@@ -758,6 +774,15 @@
           </div>
 
           <div class="host-block">
+            <h3>新春留言箱</h3>
+            <div class="host-actions">
+              <button class="ghost-btn" type="button" data-action="export-comments">导出留言 JSON</button>
+              <button class="ghost-btn danger" type="button" data-action="clear-comments">清空留言</button>
+            </div>
+            <ul class="comment-list" data-role="comment-list"></ul>
+          </div>
+
+          <div class="host-block">
             <h3>主持人口令</h3>
             <div class="host-auth-row">
               <input type="password" maxlength="32" placeholder="设置新口令" data-role="new-pin" />
@@ -777,58 +802,6 @@
 	</div>
 
 	<div class="page-template-comments">
-		
-		<div class="comments-container mt-10 w-full ">
-    <div id="comment-anchor" class="w-full h-2.5"></div>
-    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
-        Comments
-    </div>
-    
-
-        
-            
-    <div id="waline"></div>
-    <script type="module" data-swup-reload-script>
-      import { init } from '/js/libs/waline.js';
-
-      function loadWaline() {
-        init({
-          el: '#waline',
-          serverURL: 'https://example.example.com',
-          dark: 'body[class~="dark-mode"]',
-          reaction: false,
-          requiredMeta: ['nick'],
-          emoji: ['https://unpkg.com/@waline/emojis@1.1.0/weibo', 'https://unpkg.com/@waline/emojis@1.1.0/bilibili'],
-                    lang: 'zh-CN',
-          login: 'disable',
-          preview: false,
-          meta: ['nick'],
-        });
-      }
-
-      if (typeof swup !== 'undefined') {
-        loadWaline();
-      } else {
-        window.addEventListener('DOMContentLoaded', loadWaline);
-      }
-    </script>
-    
-      <style>
-        #waline .wl-preview {
-          display: none !important;
-        }
-        #waline .wl-footer .wl-actions .wl-action:last-of-type {
-          display: none !important;
-        }
-      </style>
-    
-
-
-
-        
-    
-</div>
-
 		
 	</div>
 </div>

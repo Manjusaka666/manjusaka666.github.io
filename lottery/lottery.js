@@ -11,10 +11,12 @@
 
   const APP_SELECTOR = "[data-horse-lottery-app]";
   const MAX_RECORDS = 300;
+  const MAX_COMMENTS = 300;
 
   const STORAGE_KEYS = {
     pool: "horse-lottery-pool-v4",
     records: "horse-lottery-records-v4",
+    comments: "horse-lottery-comments-v1",
     hostPin: "horse-lottery-host-pin-v1",
     hostUnlocked: "horse-lottery-host-unlocked-v1",
   };
@@ -31,6 +33,17 @@
     { id: "p07", name: "西西的锦绣香囊礼", detail: "南京香囊与流苏挂件套装 1 份", weight: 13, enabled: true },
     { id: "p08", name: "公主哆哆西西终极礼", detail: "马年好运红包礼物 + 新春纪念周边套装", weight: 12, enabled: true },
   ];
+
+  const FESTIVAL_EFFECTS = {
+    p01: { icons: ["🧧", "🧨", "🐴", "✨"] },
+    p02: { icons: ["🏮", "🐴", "✨", "🎊"] },
+    p03: { icons: ["🎊", "🐎", "🧧", "💫"] },
+    p04: { icons: ["🪭", "🐴", "✨", "🏮"] },
+    p05: { icons: ["🏮", "✨", "🎇", "🐴"] },
+    p06: { icons: ["🪭", "🎉", "✨", "🐎"] },
+    p07: { icons: ["🎊", "🏮", "🧧", "✨"] },
+    p08: { icons: ["🧧", "🎉", "🐴", "🎇"] },
+  };
 
   function cloneDefaultPool() {
     return DEFAULT_PRIZE_POOL.map((item) => ({ ...item }));
@@ -100,6 +113,27 @@
       .slice(0, MAX_RECORDS);
   }
 
+  function normalizeCommentItem(item) {
+    return {
+      id: item.id || `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      timestamp: Number(item.timestamp) || Date.now(),
+      playerName: String(item.playerName || "神秘朋友").slice(0, 24),
+      content: String(item.content || "").slice(0, 180),
+    };
+  }
+
+  function loadComments() {
+    const saved = readFromStorage(STORAGE_KEYS.comments, []);
+    if (!Array.isArray(saved)) {
+      return [];
+    }
+    return saved
+      .filter((item) => item && typeof item === "object")
+      .map((item) => normalizeCommentItem(item))
+      .filter((item) => item.content.trim())
+      .slice(0, MAX_COMMENTS);
+  }
+
   function loadHostPin() {
     const saved = localStorage.getItem(STORAGE_KEYS.hostPin);
     return saved && saved.trim() ? saved : DEFAULT_HOST_PIN;
@@ -154,8 +188,8 @@
     return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
   }
 
-  function downloadRecords(records) {
-    const payload = JSON.stringify(records, null, 2);
+  function downloadJSON(data, prefix) {
+    const payload = JSON.stringify(data, null, 2);
     const blob = new Blob([payload], { type: "application/json;charset=utf-8" });
     const link = document.createElement("a");
     const now = new Date();
@@ -169,7 +203,7 @@
     ].join("");
 
     link.href = URL.createObjectURL(blob);
-    link.download = `horse-lottery-records-${stamp}.json`;
+    link.download = `${prefix}-${stamp}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -272,6 +306,99 @@
     });
   }
 
+  function renderComments(container, comments) {
+    container.innerHTML = "";
+    if (!comments.length) {
+      const empty = document.createElement("li");
+      empty.className = "comment-empty";
+      empty.textContent = "还没有新春留言。";
+      container.appendChild(empty);
+      return;
+    }
+
+    comments.forEach((comment) => {
+      const item = document.createElement("li");
+      item.className = "comment-list-item";
+
+      const main = document.createElement("p");
+      main.className = "comment-main";
+      main.textContent = comment.content;
+
+      const meta = document.createElement("p");
+      meta.className = "comment-meta";
+      meta.textContent = `${comment.playerName} · ${formatTimestamp(comment.timestamp)}`;
+
+      item.appendChild(main);
+      item.appendChild(meta);
+      container.appendChild(item);
+    });
+  }
+
+  function insertAtCursor(textarea, text) {
+    if (!textarea) {
+      return;
+    }
+    const start = textarea.selectionStart ?? textarea.value.length;
+    const end = textarea.selectionEnd ?? textarea.value.length;
+    textarea.value = textarea.value.slice(0, start) + text + textarea.value.slice(end);
+    textarea.focus();
+    const nextPos = start + text.length;
+    textarea.selectionStart = nextPos;
+    textarea.selectionEnd = nextPos;
+  }
+
+  function playFestivalAnimation(layer, resultName, resultBox, prizeId) {
+    if (!layer || !resultName || !resultBox) {
+      return;
+    }
+
+    const effect = FESTIVAL_EFFECTS[prizeId] || { icons: ["🧧", "🐴", "✨", "🎊"] };
+    const centerX = 45 + Math.random() * 10;
+    const centerY = 38 + Math.random() * 14;
+    const total = 26;
+
+    layer.innerHTML = "";
+    const fragment = document.createDocumentFragment();
+
+    for (let i = 0; i < total; i += 1) {
+      const node = document.createElement("span");
+      node.className = "festival-burst";
+      node.textContent = effect.icons[i % effect.icons.length];
+
+      const angle = (Math.PI * 2 * i) / total + (Math.random() - 0.5) * 0.18;
+      const distance = 64 + Math.random() * 118;
+      const tx = Math.cos(angle) * distance;
+      const ty = Math.sin(angle) * distance - 36;
+      const rotate = `${-90 + Math.random() * 180}deg`;
+      const size = `${1.05 + Math.random() * 0.8}rem`;
+
+      node.style.setProperty("--fx", `${centerX}%`);
+      node.style.setProperty("--fy", `${centerY}%`);
+      node.style.setProperty("--tx", `${tx.toFixed(1)}px`);
+      node.style.setProperty("--ty", `${ty.toFixed(1)}px`);
+      node.style.setProperty("--tr", rotate);
+      node.style.setProperty("--fs", size);
+      node.style.animationDelay = `${Math.random() * 120}ms`;
+      fragment.appendChild(node);
+    }
+
+    layer.appendChild(fragment);
+    window.setTimeout(() => {
+      layer.innerHTML = "";
+    }, 1400);
+
+    resultName.classList.remove("hit");
+    resultBox.classList.remove("hit");
+    // Trigger reflow to restart animation classes.
+    void resultName.offsetWidth;
+    resultName.classList.add("hit");
+    resultBox.classList.add("hit");
+    window.setTimeout(() => {
+      resultName.classList.remove("hit");
+      resultBox.classList.remove("hit");
+    }, 820);
+  }
+
   function initLotteryApp(app) {
     if (app.dataset.inited === "true") {
       return;
@@ -281,6 +408,13 @@
     const playerInput = app.querySelector("#lottery-player-name");
     const drawButton = app.querySelector('[data-action="draw"]');
     const resultName = app.querySelector('[data-role="result-name"]');
+    const drawResultBox = app.querySelector(".draw-result");
+    const festivalLayer = app.querySelector('[data-role="festival-layer"]');
+
+    const friendCommentInput = app.querySelector('[data-role="friend-comment-input"]');
+    const friendCommentStatus = app.querySelector('[data-role="comment-status"]');
+    const sendCommentButton = app.querySelector('[data-action="send-comment"]');
+    const emojiButtons = Array.from(app.querySelectorAll('[data-role="emoji-pick"]'));
 
     const hostAuth = app.querySelector('[data-role="host-auth"]');
     const hostPanel = app.querySelector('[data-role="host-panel"]');
@@ -290,6 +424,7 @@
     const pinStatus = app.querySelector('[data-role="pin-status"]');
     const poolEditor = app.querySelector('[data-role="pool-editor"]');
     const recordsList = app.querySelector('[data-role="record-list"]');
+    const commentList = app.querySelector('[data-role="comment-list"]');
     const newPinInput = app.querySelector('[data-role="new-pin"]');
 
     const hostAuthButton = app.querySelector('[data-action="show-host-auth"]');
@@ -299,14 +434,17 @@
     const resetPoolButton = app.querySelector('[data-action="reset-pool"]');
     const exportRecordsButton = app.querySelector('[data-action="export-records"]');
     const clearRecordsButton = app.querySelector('[data-action="clear-records"]');
+    const exportCommentsButton = app.querySelector('[data-action="export-comments"]');
+    const clearCommentsButton = app.querySelector('[data-action="clear-comments"]');
     const savePinButton = app.querySelector('[data-action="save-pin"]');
 
-    if (!drawButton || !resultName || !poolEditor || !recordsList) {
+    if (!drawButton || !resultName || !drawResultBox || !poolEditor || !recordsList || !commentList) {
       return;
     }
 
     let pool = loadPrizePool();
     let records = loadRecords();
+    let comments = loadComments();
     let hostUnlocked = sessionStorage.getItem(STORAGE_KEYS.hostUnlocked) === "1";
 
     function persistPool(nextPool) {
@@ -319,6 +457,17 @@
       writeToStorage(STORAGE_KEYS.records, records);
     }
 
+    function persistComments(nextComments) {
+      comments = nextComments.slice(0, MAX_COMMENTS).map((item) => normalizeCommentItem(item));
+      writeToStorage(STORAGE_KEYS.comments, comments);
+    }
+
+    function refreshHostLists() {
+      renderPoolEditor(poolEditor, pool);
+      renderRecords(recordsList, records);
+      renderComments(commentList, comments);
+    }
+
     function showHostPanel(visible) {
       hostUnlocked = visible;
       if (visible) {
@@ -326,6 +475,7 @@
         hostPanel?.classList.remove("hidden");
         hostAuth?.classList.add("hidden");
         setMessage(authMessage, "已进入主持模式。", "success");
+        refreshHostLists();
       } else {
         sessionStorage.removeItem(STORAGE_KEYS.hostUnlocked);
         hostPanel?.classList.add("hidden");
@@ -343,17 +493,7 @@
       const playerName = playerInput?.value?.trim() || "神秘朋友";
       resultName.textContent = picked.name;
       resultName.style.color = "";
-
-      if (typeof resultName.animate === "function") {
-        resultName.animate(
-          [
-            { transform: "scale(0.98)", opacity: 0.4 },
-            { transform: "scale(1.06)", opacity: 1 },
-            { transform: "scale(1)", opacity: 1 },
-          ],
-          { duration: 320, easing: "cubic-bezier(0.22, 1, 0.36, 1)" },
-        );
-      }
+      playFestivalAnimation(festivalLayer, resultName, drawResultBox, picked.id);
 
       const nextRecords = [
         {
@@ -370,7 +510,33 @@
       renderRecords(recordsList, records);
     }
 
-    drawButton?.addEventListener("click", drawOnce);
+    function submitComment() {
+      const content = String(friendCommentInput?.value || "").trim();
+      if (!content) {
+        setMessage(friendCommentStatus, "请先输入留言内容。", "error");
+        return;
+      }
+
+      const playerName = String(playerInput?.value || "").trim() || "神秘朋友";
+      const nextComments = [
+        {
+          id: createRecordId(),
+          timestamp: Date.now(),
+          playerName: playerName.slice(0, 24),
+          content: content.slice(0, 180),
+        },
+        ...comments,
+      ];
+
+      persistComments(nextComments);
+      renderComments(commentList, comments);
+      if (friendCommentInput) {
+        friendCommentInput.value = "";
+      }
+      setMessage(friendCommentStatus, "留言已送达主持人留言箱。", "success");
+    }
+
+    drawButton.addEventListener("click", drawOnce);
     playerInput?.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         event.preventDefault();
@@ -378,9 +544,27 @@
       }
     });
 
+    sendCommentButton?.addEventListener("click", submitComment);
+    friendCommentInput?.addEventListener("keydown", (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+        event.preventDefault();
+        submitComment();
+      }
+    });
+    emojiButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const emoji = String(button.dataset.emoji || "");
+        if (!emoji) {
+          return;
+        }
+        insertAtCursor(friendCommentInput, emoji);
+      });
+    });
+
     hostAuthButton?.addEventListener("click", () => {
       if (hostUnlocked) {
         hostPanel?.classList.remove("hidden");
+        refreshHostLists();
         return;
       }
       hostAuth?.classList.toggle("hidden");
@@ -395,18 +579,14 @@
         setMessage(authMessage, "请输入主持人口令。", "error");
         return;
       }
-
       if (inputPin !== currentPin) {
         setMessage(authMessage, "口令不正确。", "error");
         return;
       }
-
       showHostPanel(true);
       if (hostPinInput) {
         hostPinInput.value = "";
       }
-      renderPoolEditor(poolEditor, pool);
-      renderRecords(recordsList, records);
     });
 
     lockButton?.addEventListener("click", () => {
@@ -441,8 +621,8 @@
         setMessage(poolStatus, "暂无记录可导出。", "error");
         return;
       }
-      downloadRecords(records);
-      setMessage(poolStatus, "已导出记录 JSON。", "success");
+      downloadJSON(records, "horse-lottery-records");
+      setMessage(poolStatus, "已导出抽奖记录 JSON。", "success");
     });
 
     clearRecordsButton?.addEventListener("click", () => {
@@ -453,6 +633,25 @@
       persistRecords([]);
       renderRecords(recordsList, records);
       setMessage(poolStatus, "记录已清空。", "success");
+    });
+
+    exportCommentsButton?.addEventListener("click", () => {
+      if (!comments.length) {
+        setMessage(poolStatus, "暂无留言可导出。", "error");
+        return;
+      }
+      downloadJSON(comments, "horse-lottery-comments");
+      setMessage(poolStatus, "已导出留言 JSON。", "success");
+    });
+
+    clearCommentsButton?.addEventListener("click", () => {
+      const confirmed = window.confirm("确定清空所有留言吗？");
+      if (!confirmed) {
+        return;
+      }
+      persistComments([]);
+      renderComments(commentList, comments);
+      setMessage(poolStatus, "留言已清空。", "success");
     });
 
     savePinButton?.addEventListener("click", () => {
@@ -474,6 +673,7 @@
 
     renderPoolEditor(poolEditor, pool);
     renderRecords(recordsList, records);
+    renderComments(commentList, comments);
   }
 
   function mountLotteryPage() {
