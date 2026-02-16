@@ -818,9 +818,12 @@
           serverURL: 'https://example.example.com',
           dark: 'body[class~="dark-mode"]',
           reaction: false,
-          requiredMeta: ['nick', 'mail'],
-          emoji: [],
+          requiredMeta: ['nick'],
+          emoji: ['https://unpkg.com/@waline/emojis@1.1.0/weibo', 'https://unpkg.com/@waline/emojis@1.1.0/bilibili'],
                     lang: 'zh-CN',
+          login: 'disable',
+          preview: false,
+          meta: ['nick'],
         });
       }
 
@@ -830,6 +833,16 @@
         window.addEventListener('DOMContentLoaded', loadWaline);
       }
     </script>
+    
+      <style>
+        #waline .wl-preview {
+          display: none !important;
+        }
+        #waline .wl-footer .wl-actions .wl-action:last-of-type {
+          display: none !important;
+        }
+      </style>
+    
 
 
 

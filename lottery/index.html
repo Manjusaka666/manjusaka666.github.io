@@ -139,8 +139,8 @@
 <meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://manjusaka666.github.io/images/redefine-og.webp">
-<meta property="article:published_time" content="2026-02-16T08:13:36.776Z">
-<meta property="article:modified_time" content="2026-02-16T08:13:36.776Z">
+<meta property="article:published_time" content="2026-02-16T08:28:45.692Z">
+<meta property="article:modified_time" content="2026-02-16T08:28:45.692Z">
 <meta property="article:author" content="Christopher(Jingle Fu)">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://manjusaka666.github.io/images/redefine-og.webp">
@@ -703,7 +703,7 @@
 
     <div class="horse-lottery-grid">
       <section class="lottery-card draw-card">
-        <h2>好友抽奖区</h2>
+        <h2>西西公主抽奖区</h2>
         <p class="card-tip">请输入昵称后点击抽奖，每次只显示奖项名称。</p>
         <div class="draw-form">
           <label for="lottery-player-name">昵称</label>
@@ -738,7 +738,7 @@
           </div>
 
           <div class="host-block">
-            <h3>奖池设置（10 项）</h3>
+            <h3>奖池设置（8 项）</h3>
             <p class="card-tip">可修改名称、内容、权重与启用状态。朋友只会看到名称，不会看到内容。</p>
             <div class="pool-editor" data-role="pool-editor"></div>
             <div class="host-actions">
@@ -797,9 +797,12 @@
           serverURL: 'https://example.example.com',
           dark: 'body[class~="dark-mode"]',
           reaction: false,
-          requiredMeta: ['nick', 'mail'],
-          emoji: [],
+          requiredMeta: ['nick'],
+          emoji: ['https://unpkg.com/@waline/emojis@1.1.0/weibo', 'https://unpkg.com/@waline/emojis@1.1.0/bilibili'],
                     lang: 'zh-CN',
+          login: 'disable',
+          preview: false,
+          meta: ['nick'],
         });
       }
 
@@ -809,6 +812,16 @@
         window.addEventListener('DOMContentLoaded', loadWaline);
       }
     </script>
+    
+      <style>
+        #waline .wl-preview {
+          display: none !important;
+        }
+        #waline .wl-footer .wl-actions .wl-action:last-of-type {
+          display: none !important;
+        }
+      </style>
+    
 
 
 

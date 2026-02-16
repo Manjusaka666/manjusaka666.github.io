@@ -13,8 +13,8 @@
   const MAX_RECORDS = 300;
 
   const STORAGE_KEYS = {
-    pool: "horse-lottery-pool-v3",
-    records: "horse-lottery-records-v3",
+    pool: "horse-lottery-pool-v4",
+    records: "horse-lottery-records-v4",
     hostPin: "horse-lottery-host-pin-v1",
     hostUnlocked: "horse-lottery-host-unlocked-v1",
   };
@@ -22,16 +22,14 @@
   const DEFAULT_HOST_PIN = "pony2026";
 
   const DEFAULT_PRIZE_POOL = [
-    { id: "p01", name: "公主的星光好运包", detail: "马年好运红包礼物 1 份", weight: 9, enabled: true },
-    { id: "p02", name: "哆哆的跳跳好运包", detail: "马年好运红包礼物 1 份", weight: 10, enabled: true },
-    { id: "p03", name: "西西的绵绵好运包", detail: "马年好运红包礼物 1 份 + 专属祝福卡", weight: 9, enabled: true },
-    { id: "p04", name: "公主的云锦丝巾礼", detail: "南京云锦丝巾礼盒 1 份", weight: 10, enabled: true },
-    { id: "p05", name: "哆哆的雨花石愿望礼", detail: "南京雨花石文创摆件礼盒 1 份", weight: 10, enabled: true },
-    { id: "p06", name: "西西的金陵折扇礼", detail: "金陵折扇手作礼盒 1 份", weight: 10, enabled: true },
-    { id: "p07", name: "公主的秦淮灯彩礼", detail: "秦淮灯彩手作小灯 1 份", weight: 10, enabled: true },
-    { id: "p08", name: "哆哆的香囊平安礼", detail: "南京香囊与流苏挂件套装 1 份", weight: 11, enabled: true },
-    { id: "p09", name: "西西的文具心愿礼", detail: "高颜值手帐文具礼盒 1 份", weight: 11, enabled: true },
-    { id: "p10", name: "公主哆哆西西终极礼", detail: "马年好运红包礼物 + 新春纪念周边套装", weight: 10, enabled: true },
+    { id: "p01", name: "西西公主马年闪耀礼", detail: "马年好运红包礼物 1 份", weight: 12, enabled: true },
+    { id: "p02", name: "公主的月光幸运礼", detail: "马年好运红包礼物 1 份", weight: 12, enabled: true },
+    { id: "p03", name: "哆哆的跳跳惊喜礼", detail: "马年好运红包礼物 1 份", weight: 12, enabled: true },
+    { id: "p04", name: "西西的云锦轻奢礼", detail: "南京云锦丝巾礼盒 1 份", weight: 13, enabled: true },
+    { id: "p05", name: "公主的秦淮灯彩礼", detail: "秦淮灯彩手作小灯 1 份", weight: 13, enabled: true },
+    { id: "p06", name: "哆哆的金陵折扇礼", detail: "金陵折扇手作礼盒 1 份", weight: 13, enabled: true },
+    { id: "p07", name: "西西的锦绣香囊礼", detail: "南京香囊与流苏挂件套装 1 份", weight: 13, enabled: true },
+    { id: "p08", name: "公主哆哆西西终极礼", detail: "马年好运红包礼物 + 新春纪念周边套装", weight: 12, enabled: true },
   ];
 
   function cloneDefaultPool() {
